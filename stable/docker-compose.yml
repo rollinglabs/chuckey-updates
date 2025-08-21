@@ -1,0 +1,12 @@
+services:
+  chuckey-ui:
+    image: ghcr.io/rollinglabs/chuckey-ui:v0.9.20
+    container_name: chuckey-ui
+    ports:
+      - "80:5000"
+    environment:
+      - CHUCKEY_VERSION=v0.9.20
+    volumes:
+      - /chuckey/logs:/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
