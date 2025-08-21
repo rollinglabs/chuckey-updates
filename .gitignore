@@ -1,0 +1,13 @@
+# macOS system files
+.DS_Store
+
+# Logs and temporary files
+*.log
+
+# Update folders populated on device
+/chuckey/update/*
+!/chuckey/update/update.sh
+
+# Python cache
+__pycache__/
+*.pyc
