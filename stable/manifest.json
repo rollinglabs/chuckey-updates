@@ -1,7 +1,7 @@
 {
   "version": "v0.9.21",
-  "release_date": "2025-08-22T05:04:06Z",
-  "description": "Fixes to update scripts",
+  "release_date": "2025-08-22T05:13:07Z",
+  "description": "Missing manifest file",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -24,7 +24,7 @@
     },
     "update.sh": {
       "path": "/chuckey/update/update.sh",
-      "sha256": "ab0fcde78a869bc96203e78c3652d9d341cebe1c4c8db131ddbd28da8541ccdb"
+      "sha256": "24acff3cae4c69cacc01fa5d3bfedf91d325fc210802b9551587d5ce9dcdda5d"
     }
   }
 }
