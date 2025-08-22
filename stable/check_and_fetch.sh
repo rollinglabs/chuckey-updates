@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Define constants
-REMOTE_VERSION_URL="https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/VERSION"
 REMOTE_MANIFEST_URL="https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/manifest.json"
 UPDATE_DIR="/chuckey/update"
 LOCAL_VERSION_FILE="/chuckey/VERSION"
@@ -11,11 +10,7 @@ mkdir -p "$UPDATE_DIR"
 echo "🟡 Checking for update..."
 
 # Fetch remote version
-REMOTE_VERSION=$(curl -s "$REMOTE_VERSION_URL")
-if [ -z "$REMOTE_VERSION" ]; then
-  echo "❌ Failed to fetch remote version"
-  exit 1
-fi
+REMOTE_VERSION=$(curl -s "$REMOTE_MANIFEST_URL" | jq -r '.version')
 
 # Read local version
 if [ -f "$LOCAL_VERSION_FILE" ]; then
