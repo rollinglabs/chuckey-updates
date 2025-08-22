@@ -61,15 +61,37 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
 
       UPDATE_SH_PATH=$(jq -r '.files["update.sh"].path' "$UPDATE_DIR/manifest.json")
       if [ -f "$UPDATE_SH_PATH" ]; then
-        echo "♻️ Updating update.sh..."
-        curl -s -o "$UPDATE_SH_PATH" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/update.sh"
         EXPECTED_HASH=$(jq -r '.files["update.sh"].sha256' "$UPDATE_DIR/manifest.json")
-        DOWNLOADED_HASH=$(sha256sum "$UPDATE_SH_PATH" | awk '{print $1}')
-        if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
-          echo "❌ Hash mismatch for update.sh. Aborting update."
-          exit 1
+        CURRENT_HASH=$(sha256sum "$UPDATE_SH_PATH" | awk '{print $1}')
+        if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
+          echo "♻️ Updating update.sh..."
+          curl -s -o "$UPDATE_SH_PATH" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/update.sh"
+          DOWNLOADED_HASH=$(sha256sum "$UPDATE_SH_PATH" | awk '{print $1}')
+          if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
+            echo "❌ Hash mismatch for update.sh. Aborting update."
+            exit 1
+          fi
+          chmod +x "$UPDATE_SH_PATH"
+        else
+          echo "✅ update.sh is up to date"
         fi
-        chmod +x "$UPDATE_SH_PATH"
+      fi
+
+      DOCKER_COMPOSE_PATH=$(jq -r '.files["docker-compose.yml"].path' "$UPDATE_DIR/manifest.json")
+      if [ -f "$DOCKER_COMPOSE_PATH" ]; then
+        EXPECTED_HASH=$(jq -r '.files["docker-compose.yml"].sha256' "$UPDATE_DIR/manifest.json")
+        CURRENT_HASH=$(sha256sum "$DOCKER_COMPOSE_PATH" | awk '{print $1}')
+        if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
+          echo "♻️ Updating docker-compose.yml..."
+          curl -s -o "$DOCKER_COMPOSE_PATH" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/docker-compose.yml"
+          DOWNLOADED_HASH=$(sha256sum "$DOCKER_COMPOSE_PATH" | awk '{print $1}')
+          if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
+            echo "❌ Hash mismatch for docker-compose.yml. Aborting update."
+            exit 1
+          fi
+        else
+          echo "✅ docker-compose.yml is up to date"
+        fi
       fi
     else
       echo "⚠️ jq not found, skipping self-update of scripts"

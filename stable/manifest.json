@@ -1,6 +1,6 @@
 {
   "version": "v0.9.21",
-  "release_date": "2025-08-22T04:56:48Z",
+  "release_date": "2025-08-22T05:04:06Z",
   "description": "Fixes to update scripts",
   "requires_reboot": false,
   "components": {
@@ -20,7 +20,7 @@
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/update/check_and_fetch.sh",
-      "sha256": "b8cb0b0089b4f7a89894d4c0e2019680ac91025d81c1fa1ef2f36ecf286604ea"
+      "sha256": "ae83363655546789dc5552b43e59000508e8c3381a8d2c7e4de5c84e69e750d8"
     },
     "update.sh": {
       "path": "/chuckey/update/update.sh",
