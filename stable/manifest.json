@@ -1,4 +1,30 @@
 {
-  "version": "v0.9.20",
-  "description": "Example update package"
+  "version": "v0.9.21",
+  "release_date": "2025-08-22T11:00:00Z",
+  "description": "Update UI and scripts; improved stability",
+  "requires_reboot": false,
+  "components": {
+    "chuckey-ui": {
+      "version": "v0.9.23",
+      "description": "Updated dashboard, fixed update check bug"
+    },
+    "unifi-controller": {
+      "version": "v7.5.187",
+      "description": "No change"
+    }
+  },
+  "files": {
+    "docker-compose.yml": {
+      "path": "/chuckey/docker-compose.yml",
+      "sha256": "abc123..."
+    },
+    "check_and_fetch.sh": {
+      "path": "/chuckey/update/check_and_fetch.sh",
+      "sha256": "def456..."
+    },
+    "update.sh": {
+      "path": "/chuckey/update/update.sh",
+      "sha256": "ghi789..."
+    }
+  }
 }
