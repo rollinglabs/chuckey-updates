@@ -22,7 +22,7 @@ HASH_COMPOSE=$(shasum -a 256 ./stable/docker-compose.yml | awk '{print $1}')
 HASH_CHECK=$(shasum -a 256 ./stable/check_and_fetch.sh | awk '{print $1}')
 HASH_UPDATE=$(shasum -a 256 ./stable/update.sh | awk '{print $1}')
 
-cat > manifest.json <<EOF
+cat > ./stable/manifest.json <<EOF
 {
   "version": "$VERSION",
   "release_date": "$RELEASE_DATE",
@@ -55,4 +55,4 @@ cat > manifest.json <<EOF
 }
 EOF
 
-echo "✅ Manifest built: manifest.json"
+echo "✅ Manifest built: stable/manifest.json"
