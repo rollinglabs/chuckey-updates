@@ -42,18 +42,8 @@ NEW_VERSION=$(cat "$UPDATE_VERSION_FILE")
 echo "$NEW_VERSION" > "$LOCAL_VERSION_FILE"
 echo "📝 Updated version to $NEW_VERSION"
 
-
 # Start updated services
 echo "🚀 Starting updated services..."
 docker compose -f "$CHUCKEY_DIR/docker-compose.yml" up -d
-
-# Optional: update supporting scripts if present in the update package
-for script in check_and_fetch.sh update.sh; do
-  if [ -f "$UPDATE_DIR/$script" ]; then
-    echo "🔁 Updating $script..."
-    cp "$UPDATE_DIR/$script" "$CHUCKEY_DIR/$script"
-    chmod +x "$CHUCKEY_DIR/$script"
-  fi
-done
 
 echo "✅ Update applied successfully"
