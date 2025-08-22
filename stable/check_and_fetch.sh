@@ -64,7 +64,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
         EXPECTED_HASH=$(jq -r '.files["update.sh"].sha256' "$UPDATE_DIR/manifest.json")
         CURRENT_HASH=$(sha256sum "$UPDATE_SH_PATH" | awk '{print $1}')
         if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
-          echo "♻️ Updating update.sh..."
+          echo "⬆️ Updating update.sh..."
           curl -s -o "$UPDATE_SH_PATH" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/update.sh"
           DOWNLOADED_HASH=$(sha256sum "$UPDATE_SH_PATH" | awk '{print $1}')
           if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
@@ -82,7 +82,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
         EXPECTED_HASH=$(jq -r '.files["docker-compose.yml"].sha256' "$UPDATE_DIR/manifest.json")
         CURRENT_HASH=$(sha256sum "$DOCKER_COMPOSE_PATH" | awk '{print $1}')
         if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
-          echo "♻️ Updating docker-compose.yml..."
+          echo "⬆️ Updating docker-compose.yml..."
           curl -s -o "$DOCKER_COMPOSE_PATH" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/docker-compose.yml"
           DOWNLOADED_HASH=$(sha256sum "$DOCKER_COMPOSE_PATH" | awk '{print $1}')
           if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
