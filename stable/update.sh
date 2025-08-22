@@ -19,12 +19,19 @@ if [ ! -f "$UPDATE_VERSION_FILE" ]; then
   exit 1
 fi
 
-# Stop running services if docker-compose.yml exists
+# Stop running services
 if [ -f "$CHUCKEY_DIR/docker-compose.yml" ]; then
-  echo "🛑 Stopping current services..."
+  echo "🛑 Stopping current services using docker-compose..."
   docker compose -f "$CHUCKEY_DIR/docker-compose.yml" down
 else
-  echo "⚠️ No existing docker-compose.yml found, skipping shutdown"
+  echo "⚠️ No docker-compose.yml found. Stopping all running containers as fallback..."
+  running_containers=$(docker ps -q)
+  if [ -n "$running_containers" ]; then
+    docker stop $running_containers
+    docker rm $running_containers
+  else
+    echo "✅ No running containers to stop."
+  fi
 fi
 
 # Replace the current docker-compose.yml with the updated one
@@ -35,9 +42,6 @@ cp "$UPDATE_DIR/docker-compose.yml" "$CHUCKEY_DIR/docker-compose.yml"
 echo "📥 Pulling latest images..."
 docker compose -f "$CHUCKEY_DIR/docker-compose.yml" pull
 
-# Ensure all containers are stopped and removed cleanly
-echo "🧹 Removing existing containers..."
-docker compose -f "$CHUCKEY_DIR/docker-compose.yml" down
 
 # Update version
 NEW_VERSION=$(cat "$UPDATE_VERSION_FILE")
