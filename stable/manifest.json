@@ -1,7 +1,7 @@
 {
   "version": "v0.9.21",
-  "release_date": "2025-08-22T04:39:28Z",
-  "description": "Fix to manifest builder",
+  "release_date": "2025-08-22T04:56:48Z",
+  "description": "Fixes to update scripts",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -20,7 +20,7 @@
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/update/check_and_fetch.sh",
-      "sha256": "f68391aa5ac02f53d51200f38ce75257a8673393db7a47121fb3add89db23295"
+      "sha256": "b8cb0b0089b4f7a89894d4c0e2019680ac91025d81c1fa1ef2f36ecf286604ea"
     },
     "update.sh": {
       "path": "/chuckey/update/update.sh",

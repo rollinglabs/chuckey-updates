@@ -40,18 +40,23 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
     if command -v jq >/dev/null 2>&1; then
       CHECK_AND_FETCH_PATH=$(jq -r '.files["check_and_fetch.sh"].path' "$UPDATE_DIR/manifest.json")
       if [ -f "$CHECK_AND_FETCH_PATH" ]; then
-        echo "♻️ Updating check_and_fetch.sh..."
-        curl -s -o "$CHECK_AND_FETCH_PATH" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/check_and_fetch.sh"
         EXPECTED_HASH=$(jq -r '.files["check_and_fetch.sh"].sha256' "$UPDATE_DIR/manifest.json")
-        DOWNLOADED_HASH=$(sha256sum "$CHECK_AND_FETCH_PATH" | awk '{print $1}')
-        if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
-          echo "❌ Hash mismatch for check_and_fetch.sh. Aborting update."
-          exit 1
+        CURRENT_HASH=$(sha256sum "$CHECK_AND_FETCH_PATH" | awk '{print $1}')
+        if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
+          echo "♻️ Updating check_and_fetch.sh..."
+          curl -s -o "$CHECK_AND_FETCH_PATH" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/check_and_fetch.sh"
+          DOWNLOADED_HASH=$(sha256sum "$CHECK_AND_FETCH_PATH" | awk '{print $1}')
+          if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
+            echo "❌ Hash mismatch for check_and_fetch.sh. Aborting update."
+            exit 1
+          fi
+          chmod +x "$CHECK_AND_FETCH_PATH"
+          echo "🔁 Restarting to apply updated check_and_fetch.sh..."
+          export CHECK_AND_FETCH_UPDATED=1
+          exec "$0"
+        else
+          echo "✅ check_and_fetch.sh is up to date"
         fi
-        chmod +x "$CHECK_AND_FETCH_PATH"
-        echo "🔁 Restarting to apply updated check_and_fetch.sh..."
-        export CHECK_AND_FETCH_UPDATED=1
-        exec "$0"
       fi
 
       UPDATE_SH_PATH=$(jq -r '.files["update.sh"].path' "$UPDATE_DIR/manifest.json")
