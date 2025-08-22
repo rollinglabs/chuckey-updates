@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.22",
-  "release_date": "2025-08-22T12:31:40Z",
-  "description": "Several updates to UI",
+  "version": "v0.9.23",
+  "release_date": "2025-08-22T12:57:14Z",
+  "description": "UI fixes",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.27",
-      "description": "UI updates"
+      "version": "v0.9.28",
+      "description": "UI fixes"
     },
     "unifi-controller": {
       "version": "v1.1.1.1",
@@ -24,7 +24,7 @@
     },
     "update.sh": {
       "path": "/chuckey/update/update.sh",
-      "sha256": "24acff3cae4c69cacc01fa5d3bfedf91d325fc210802b9551587d5ce9dcdda5d"
+      "sha256": "54815813a2241290b864e16f7944c96d7212b2c01b7a067c0666814a5ab441a7"
     }
   }
 }

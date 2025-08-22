@@ -31,11 +31,13 @@ fi
 echo "📦 Applying updated docker-compose.yml..."
 cp "$UPDATE_DIR/docker-compose.yml" "$CHUCKEY_DIR/docker-compose.yml"
 
-# Ensure previous container is fully removed to avoid conflict
-if docker ps -a --format '{{.Names}}' | grep -Eq '^chuckey-ui$'; then
-  echo "🧹 Removing existing chuckey-ui container..."
-  docker rm -f chuckey-ui
-fi
+# Pull latest images
+echo "📥 Pulling latest images..."
+docker compose -f "$CHUCKEY_DIR/docker-compose.yml" pull
+
+# Ensure all containers are stopped and removed cleanly
+echo "🧹 Removing existing containers..."
+docker compose -f "$CHUCKEY_DIR/docker-compose.yml" down
 
 # Update version
 NEW_VERSION=$(cat "$UPDATE_VERSION_FILE")
