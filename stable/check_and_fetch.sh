@@ -34,6 +34,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
   curl -s -o "$UPDATE_DIR/manifest.json" "$REMOTE_MANIFEST_URL"
   echo "$REMOTE_VERSION" > "$UPDATE_DIR/VERSION"
   echo "✅ Fetched update files"
+  /chuckey/update/update.sh
 else
   echo "✅ Already up to date"
 fi
