@@ -1,12 +1,18 @@
+# version: "3.9"
+
 services:
   chuckey-ui:
-    image: ghcr.io/rollinglabs/chuckey-ui:v0.9.20
+    image: ghcr.io/rollinglabs/chuckey-ui:latest
     container_name: chuckey-ui
-    ports:
-      - "80:5000"
-    environment:
-      - CHUCKEY_VERSION=v0.9.20
-    volumes:
-      - /chuckey/logs:/logs
-      - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /chuckey:/chuckey:ro
+      - /chuckey/logs:/app/logs
+      - /chuckey/data:/app/data
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost/update-check')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
