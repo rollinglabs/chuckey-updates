@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.29",
-  "release_date": "2025-08-23T02:59:14Z",
-  "description": "Fix path issue",
+  "version": "v0.9.30",
+  "release_date": "2025-08-23T03:11:29Z",
+  "description": "Fix script issue",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -20,7 +20,7 @@
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
-      "sha256": "c605330a5dcb7d13ac2dcc550763077f2707d305010d4b68ceb2b1b6d5a23267"
+      "sha256": "2c223879110be4c11b6abf4a90d548220cf66ce36b578bbd561493b99a476005"
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",

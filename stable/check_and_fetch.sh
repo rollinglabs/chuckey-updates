@@ -42,6 +42,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
   if [ "$SKIP_SELF_UPDATE" != "true" ]; then
     if command -v jq >/dev/null 2>&1; then
       CHECK_AND_FETCH_PATH=$(jq -r '.files["check_and_fetch.sh"].path' "$UPDATE_DIR/manifest.json")
+      echo "🔍 Verifying check_and_fetch.sh at: $CHECK_AND_FETCH_PATH"
       if [ -f "$CHECK_AND_FETCH_PATH" ]; then
         EXPECTED_HASH=$(jq -r '.files["check_and_fetch.sh"].sha256' "$UPDATE_DIR/manifest.json")
         CURRENT_HASH=$(sha256sum "$CHECK_AND_FETCH_PATH" | awk '{print $1}')
@@ -69,6 +70,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
 
   if command -v jq >/dev/null 2>&1; then
     UPDATE_SH_PATH=$(jq -r '.files["update.sh"].path' "$UPDATE_DIR/manifest.json")
+    echo "🔍 Verifying update.sh at: $UPDATE_SH_PATH"
     if [ -f "$UPDATE_SH_PATH" ]; then
       EXPECTED_HASH=$(jq -r '.files["update.sh"].sha256' "$UPDATE_DIR/manifest.json")
       CURRENT_HASH=$(sha256sum "$UPDATE_SH_PATH" | awk '{print $1}')
@@ -106,6 +108,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
     fi
 
     GET_STATS_PATH=$(jq -r '.files["get_stats.sh"].path' "$UPDATE_DIR/manifest.json")
+    echo "🔍 Verifying get_stats.sh at: $GET_STATS_PATH"
     if [ -f "$GET_STATS_PATH" ]; then
       EXPECTED_HASH=$(jq -r '.files["get_stats.sh"].sha256' "$UPDATE_DIR/manifest.json")
       CURRENT_HASH=$(sha256sum "$GET_STATS_PATH" | awk '{print $1}')
@@ -130,8 +133,10 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
   echo "✅ Fetched update files"
   UPDATE_SH_PATH=$(jq -r '.files["update.sh"].path' "$UPDATE_DIR/manifest.json")
   DOCKER_COMPOSE_PATH=$(jq -r '.files["docker-compose.yml"].path' "$UPDATE_DIR/manifest.json")
+  # Diagnostic: log the path before checking
+  echo "🔍 Verifying docker-compose.yml at: $DOCKER_COMPOSE_PATH"
   # Ensure docker-compose.yml exists at its destination location before running update.sh
-  if [ ! -f "$DOCKER_COMPOSE_PATH" ]; then
+  if [ -z "$DOCKER_COMPOSE_PATH" ] || [ ! -f "$DOCKER_COMPOSE_PATH" ]; then
     echo "❌ docker-compose.yml not found at expected location: $DOCKER_COMPOSE_PATH"
     exit 1
   fi
