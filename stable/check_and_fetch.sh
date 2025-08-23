@@ -44,12 +44,13 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
         CURRENT_HASH=$(sha256sum "$CHECK_AND_FETCH_PATH" | awk '{print $1}')
         if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
           echo "♻️ Updating check_and_fetch.sh..."
-          curl -s -o "$CHECK_AND_FETCH_PATH" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/check_and_fetch.sh"
-          DOWNLOADED_HASH=$(sha256sum "$CHECK_AND_FETCH_PATH" | awk '{print $1}')
+          curl -s -o "$UPDATE_DIR/check_and_fetch.sh" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/check_and_fetch.sh"
+          DOWNLOADED_HASH=$(sha256sum "$UPDATE_DIR/check_and_fetch.sh" | awk '{print $1}')
           if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
             echo "❌ Hash mismatch for check_and_fetch.sh. Aborting update."
             exit 1
           fi
+          mv "$UPDATE_DIR/check_and_fetch.sh" "$CHECK_AND_FETCH_PATH"
           chmod +x "$CHECK_AND_FETCH_PATH"
           echo "🔁 Restarting to apply updated check_and_fetch.sh..."
           export CHECK_AND_FETCH_UPDATED=1
@@ -65,12 +66,13 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
         CURRENT_HASH=$(sha256sum "$UPDATE_SH_PATH" | awk '{print $1}')
         if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
           echo "⬆️ Updating update.sh..."
-          curl -s -o "$UPDATE_SH_PATH" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/update.sh"
-          DOWNLOADED_HASH=$(sha256sum "$UPDATE_SH_PATH" | awk '{print $1}')
+          curl -s -o "$UPDATE_DIR/update.sh" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/update.sh"
+          DOWNLOADED_HASH=$(sha256sum "$UPDATE_DIR/update.sh" | awk '{print $1}')
           if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
             echo "❌ Hash mismatch for update.sh. Aborting update."
             exit 1
           fi
+          mv "$UPDATE_DIR/update.sh" "$UPDATE_SH_PATH"
           chmod +x "$UPDATE_SH_PATH"
         else
           echo "✅ update.sh is up to date"
@@ -83,14 +85,34 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
         CURRENT_HASH=$(sha256sum "$DOCKER_COMPOSE_PATH" | awk '{print $1}')
         if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
           echo "⬆️ Updating docker-compose.yml..."
-          curl -s -o "$DOCKER_COMPOSE_PATH" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/docker-compose.yml"
-          DOWNLOADED_HASH=$(sha256sum "$DOCKER_COMPOSE_PATH" | awk '{print $1}')
+          curl -s -o "$UPDATE_DIR/docker-compose.yml" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/docker-compose.yml"
+          DOWNLOADED_HASH=$(sha256sum "$UPDATE_DIR/docker-compose.yml" | awk '{print $1}')
           if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
             echo "❌ Hash mismatch for docker-compose.yml. Aborting update."
             exit 1
           fi
+          mv "$UPDATE_DIR/docker-compose.yml" "$DOCKER_COMPOSE_PATH"
         else
           echo "✅ docker-compose.yml is up to date"
+        fi
+      fi
+
+      GET_STATS_PATH=$(jq -r '.files["get_stats.sh"].path' "$UPDATE_DIR/manifest.json")
+      if [ -f "$GET_STATS_PATH" ]; then
+        EXPECTED_HASH=$(jq -r '.files["get_stats.sh"].sha256' "$UPDATE_DIR/manifest.json")
+        CURRENT_HASH=$(sha256sum "$GET_STATS_PATH" | awk '{print $1}')
+        if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
+          echo "⬆️ Updating get_stats.sh..."
+          curl -s -o "$UPDATE_DIR/get_stats.sh" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/get_stats.sh"
+          DOWNLOADED_HASH=$(sha256sum "$UPDATE_DIR/get_stats.sh" | awk '{print $1}')
+          if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
+            echo "❌ Hash mismatch for get_stats.sh. Aborting update."
+            exit 1
+          fi
+          mv "$UPDATE_DIR/get_stats.sh" "$GET_STATS_PATH"
+          chmod +x "$GET_STATS_PATH"
+        else
+          echo "✅ get_stats.sh is up to date"
         fi
       fi
     else

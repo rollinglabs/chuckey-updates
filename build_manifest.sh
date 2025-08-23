@@ -45,11 +45,11 @@ cat > ./stable/manifest.json <<EOF
       "sha256": "$HASH_COMPOSE"
     },
     "check_and_fetch.sh": {
-      "path": "/chuckey/update/check_and_fetch.sh",
+      "path": "/chuckey/scripts/check_and_fetch.sh",
       "sha256": "$HASH_CHECK"
     },
     "update.sh": {
-      "path": "/chuckey/update/update.sh",
+      "path": "/chuckey/scripts/update.sh",
       "sha256": "$HASH_UPDATE"
     },
     "scripts/get_stats.sh": {

@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.25",
-  "release_date": "2025-08-23T01:46:06Z",
-  "description": "New stats endpoint",
+  "version": "v0.9.26",
+  "release_date": "2025-08-23T02:09:08Z",
+  "description": "UI fixes",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.29",
-      "description": "Dashboard updates"
+      "version": "v0.9.30",
+      "description": "UI fixes"
     },
     "unifi-controller": {
       "version": "v1.1.1.1",
@@ -19,11 +19,11 @@
       "sha256": "2bff8c56e3d1f742aa8f7260a119f3d13ce40e38515d26df119ee183d1715cc8"
     },
     "check_and_fetch.sh": {
-      "path": "/chuckey/update/check_and_fetch.sh",
-      "sha256": "4777c23919041097a6606b5e519c81fa75f4eb121d32b6529e35df524910955b"
+      "path": "/chuckey/scripts/check_and_fetch.sh",
+      "sha256": "84150e1ecf0991a48b1f6f5ac793012cee5e7588fa29ee8a9b8158a24ac53496"
     },
     "update.sh": {
-      "path": "/chuckey/update/update.sh",
+      "path": "/chuckey/scripts/update.sh",
       "sha256": "8e8afa62bc4933f9d68eebfbdf90588aa0dd5ba0fc8b8a108a084f90558bc81c"
     },
     "scripts/get_stats.sh": {
