@@ -34,6 +34,8 @@ echo "🧠 Local: $CURRENT_VERSION | Remote: $REMOTE_VERSION"
 
 NEWER_VERSION=$(printf "%s\n%s" "$REMOTE_VERSION" "$CURRENT_VERSION" | sort -V | tail -n1)
 
+FILE_UPDATED=false
+
 if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_VERSION" ]; then
   echo "⬇️ Update available! Fetching..."
   curl -s -o "$UPDATE_DIR/manifest.json" "$REMOTE_MANIFEST_URL"
@@ -56,6 +58,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
           fi
           mv "$UPDATE_DIR/check_and_fetch.sh" "$CHECK_AND_FETCH_PATH"
           chmod +x "$CHECK_AND_FETCH_PATH"
+          FILE_UPDATED=true
           echo "🔁 Restarting to apply updated check_and_fetch.sh..."
           export CHECK_AND_FETCH_UPDATED=1
           exec "$0"
@@ -84,6 +87,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
         fi
         mv "$UPDATE_DIR/update.sh" "$UPDATE_SH_PATH"
         chmod +x "$UPDATE_SH_PATH"
+        FILE_UPDATED=true
       else
         echo "✅ update.sh is up to date"
       fi
@@ -102,12 +106,11 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
           exit 1
         fi
         mv "$UPDATE_DIR/docker-compose.yml" "$DOCKER_COMPOSE_PATH"
+        FILE_UPDATED=true
       else
+        echo "🔍 Verifying docker-compose.yml at: $DOCKER_COMPOSE_PATH"
         echo "✅ docker-compose.yml is up to date"
       fi
-      # Move docker-compose.yml validation here, after up-to-date check
-      # Diagnostic: log the path before checking
-      echo "🔍 Verifying docker-compose.yml at: $DOCKER_COMPOSE_PATH"
       # Ensure docker-compose.yml exists at its destination location before running update.sh
       if [ -z "$DOCKER_COMPOSE_PATH" ] || [ ! -f "$DOCKER_COMPOSE_PATH" ]; then
         echo "❌ docker-compose.yml not found at expected location: $DOCKER_COMPOSE_PATH"
@@ -130,6 +133,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
         fi
         mv "$UPDATE_DIR/get_stats.sh" "$GET_STATS_PATH"
         chmod +x "$GET_STATS_PATH"
+        FILE_UPDATED=true
       else
         echo "✅ get_stats.sh is up to date"
       fi
@@ -139,9 +143,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
   fi
 
   # Print fetched/updated message and call update.sh
-  # Determine if any file was updated by checking for the existence of any updated file in $UPDATE_DIR (excluding manifest.json and VERSION)
-  UPDATED_COUNT=$(find "$UPDATE_DIR" -type f ! -name 'manifest.json' ! -name 'VERSION' | wc -l)
-  if [ "$UPDATED_COUNT" -gt 0 ]; then
+  if [ "$FILE_UPDATED" = true ]; then
     echo "✅ Fetched and updated files"
   else
     echo "✅ All files already up to date"

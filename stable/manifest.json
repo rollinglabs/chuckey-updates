@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.31",
-  "release_date": "2025-08-23T04:40:27Z",
-  "description": "Fix manifest build script",
+  "version": "v0.9.32",
+  "release_date": "2025-08-23T04:57:36Z",
+  "description": "Fix UI",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.32",
-      "description": "No change"
+      "version": "v0.9.33",
+      "description": "Fix UI"
     },
     "unifi-controller": {
       "version": "v1.1.1.1",
@@ -20,7 +20,7 @@
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
-      "sha256": "35471e2732390125f5f503113bfdcf46141582a1d455e1f0f13cd97546a9810a"
+      "sha256": "e081d1362ab459f5a742e07fca7b2df9592e40f1b359ac882860e880902f0961"
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",
