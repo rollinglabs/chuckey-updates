@@ -47,7 +47,7 @@ CPU_LOAD=$(uptime | awk -F'load average:' '{ print $2 }' | cut -d',' -f1 | xargs
 start_section=$(date +%s%3N)
 if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
   CPU_TEMP_RAW=$(cat /sys/class/thermal/thermal_zone0/temp)
-  CPU_TEMP=$(awk "BEGIN {printf \"%.1f °C\", $CPU_TEMP_RAW/1000}")
+  CPU_TEMP=$(awk "BEGIN {printf \"%.1f \u00B0C\", $CPU_TEMP_RAW/1000}")
 else
   CPU_TEMP="Unavailable"
 fi

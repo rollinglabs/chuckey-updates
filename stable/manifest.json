@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.32",
-  "release_date": "2025-08-23T04:57:36Z",
-  "description": "Fix UI",
+  "version": "v0.9.33",
+  "release_date": "2025-08-23T05:31:30Z",
+  "description": "Fixes to dashboard",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.33",
-      "description": "Fix UI"
+      "version": "v0.9.34",
+      "description": "Fixes to dashboard"
     },
     "unifi-controller": {
       "version": "v1.1.1.1",
@@ -28,7 +28,7 @@
     },
     "get_stats.sh": {
       "path": "/chuckey/scripts/get_stats.sh",
-      "sha256": "5bf330cc147d95e86bfb7b4586504c35323b4e3604d768b9543c58f4fba1f040"
+      "sha256": "9f046840abece48f6f19a2d31454c105a40d1a288756d5871a3d186f872f3c0c"
     }
   }
 }
