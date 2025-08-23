@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.30",
-  "release_date": "2025-08-23T03:11:29Z",
-  "description": "Fix script issue",
+  "version": "v0.9.31",
+  "release_date": "2025-08-23T04:36:45Z",
+  "description": "Fixed update scripts",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -20,11 +20,11 @@
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
-      "sha256": "2c223879110be4c11b6abf4a90d548220cf66ce36b578bbd561493b99a476005"
+      "sha256": "35471e2732390125f5f503113bfdcf46141582a1d455e1f0f13cd97546a9810a"
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",
-      "sha256": "8e8afa62bc4933f9d68eebfbdf90588aa0dd5ba0fc8b8a108a084f90558bc81c"
+      "sha256": "a643addbc8b5b271ac20d913220728866c4d317b99ffd75eb9729ae98345c956"
     },
     "scripts/get_stats.sh": {
       "path": "/chuckey/scripts/get_stats.sh",

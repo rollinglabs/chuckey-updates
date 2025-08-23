@@ -8,9 +8,10 @@ UPDATE_VERSION_FILE="$UPDATE_DIR/VERSION"
 
 echo "🛠️ Applying update..."
 
-# Check if required update files exist
-if [ ! -f "$UPDATE_DIR/docker-compose.yml" ]; then
-  echo "❌ Missing docker-compose.yml in update folder"
+#
+# Check if required docker-compose.yml exists in the expected location
+if [ ! -f "$CHUCKEY_DIR/docker-compose.yml" ]; then
+  echo "❌ docker-compose.yml not found at expected location: $CHUCKEY_DIR/docker-compose.yml"
   exit 1
 fi
 
@@ -34,9 +35,6 @@ else
   fi
 fi
 
-# Replace the current docker-compose.yml with the updated one
-echo "📦 Applying updated docker-compose.yml..."
-cp "$UPDATE_DIR/docker-compose.yml" "$CHUCKEY_DIR/docker-compose.yml"
 
 # Pull latest images
 echo "📥 Pulling latest images..."

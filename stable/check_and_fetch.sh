@@ -105,6 +105,14 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
       else
         echo "✅ docker-compose.yml is up to date"
       fi
+      # Move docker-compose.yml validation here, after up-to-date check
+      # Diagnostic: log the path before checking
+      echo "🔍 Verifying docker-compose.yml at: $DOCKER_COMPOSE_PATH"
+      # Ensure docker-compose.yml exists at its destination location before running update.sh
+      if [ -z "$DOCKER_COMPOSE_PATH" ] || [ ! -f "$DOCKER_COMPOSE_PATH" ]; then
+        echo "❌ docker-compose.yml not found at expected location: $DOCKER_COMPOSE_PATH"
+        exit 1
+      fi
     fi
 
     GET_STATS_PATH=$(jq -r '.files["get_stats.sh"].path' "$UPDATE_DIR/manifest.json")
@@ -130,16 +138,15 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
     echo "⚠️ jq not found, skipping update of other scripts"
   fi
 
-  echo "✅ Fetched update files"
-  UPDATE_SH_PATH=$(jq -r '.files["update.sh"].path' "$UPDATE_DIR/manifest.json")
-  DOCKER_COMPOSE_PATH=$(jq -r '.files["docker-compose.yml"].path' "$UPDATE_DIR/manifest.json")
-  # Diagnostic: log the path before checking
-  echo "🔍 Verifying docker-compose.yml at: $DOCKER_COMPOSE_PATH"
-  # Ensure docker-compose.yml exists at its destination location before running update.sh
-  if [ -z "$DOCKER_COMPOSE_PATH" ] || [ ! -f "$DOCKER_COMPOSE_PATH" ]; then
-    echo "❌ docker-compose.yml not found at expected location: $DOCKER_COMPOSE_PATH"
-    exit 1
+  # Print fetched/updated message and call update.sh
+  # Determine if any file was updated by checking for the existence of any updated file in $UPDATE_DIR (excluding manifest.json and VERSION)
+  UPDATED_COUNT=$(find "$UPDATE_DIR" -type f ! -name 'manifest.json' ! -name 'VERSION' | wc -l)
+  if [ "$UPDATED_COUNT" -gt 0 ]; then
+    echo "✅ Fetched and updated files"
+  else
+    echo "✅ All files already up to date"
   fi
+  UPDATE_SH_PATH=$(jq -r '.files["update.sh"].path' "$UPDATE_DIR/manifest.json")
   "$UPDATE_SH_PATH"
 else
   echo "✅ Already up to date"
