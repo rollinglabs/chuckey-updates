@@ -129,6 +129,12 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
 
   echo "✅ Fetched update files"
   UPDATE_SH_PATH=$(jq -r '.files["update.sh"].path' "$UPDATE_DIR/manifest.json")
+  DOCKER_COMPOSE_PATH=$(jq -r '.files["docker-compose.yml"].path' "$UPDATE_DIR/manifest.json")
+  # Ensure docker-compose.yml exists at its destination location before running update.sh
+  if [ ! -f "$DOCKER_COMPOSE_PATH" ]; then
+    echo "❌ docker-compose.yml not found at expected location: $DOCKER_COMPOSE_PATH"
+    exit 1
+  fi
   "$UPDATE_SH_PATH"
 else
   echo "✅ Already up to date"
