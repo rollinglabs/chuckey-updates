@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.27",
-  "release_date": "2025-08-23T02:28:23Z",
-  "description": "Update script fixes",
+  "version": "v0.9.28",
+  "release_date": "2025-08-23T02:49:50Z",
+  "description": "Backend stats fix",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.30",
-      "description": "No change"
+      "version": "v0.9.32",
+      "description": "Backend stats fix"
     },
     "unifi-controller": {
       "version": "v1.1.1.1",
@@ -20,7 +20,7 @@
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
-      "sha256": "2c71ff48d828429b1282d69a0b71ac6516fd69ea66ed9c357a7f5d6e38030e23"
+      "sha256": "17ec8b4b4ce4d268967c2f985acf849ccf413c63403dd7343c1cd920e19fda39"
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",

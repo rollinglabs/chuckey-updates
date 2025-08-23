@@ -128,7 +128,8 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
   fi
 
   echo "✅ Fetched update files"
-  /chuckey/update/update.sh
+  UPDATE_SH_PATH=$(jq -r '.files["update.sh"].path' "$UPDATE_DIR/manifest.json")
+  "$UPDATE_SH_PATH"
 else
   echo "✅ Already up to date"
 fi
