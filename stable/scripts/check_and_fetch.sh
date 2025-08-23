@@ -50,7 +50,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
         CURRENT_HASH=$(sha256sum "$CHECK_AND_FETCH_PATH" | awk '{print $1}')
         if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
           echo "♻️ Updating check_and_fetch.sh..."
-          curl -s -o "$UPDATE_DIR/check_and_fetch.sh" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/check_and_fetch.sh"
+          curl -s -o "$UPDATE_DIR/check_and_fetch.sh" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/scripts/check_and_fetch.sh"
           DOWNLOADED_HASH=$(sha256sum "$UPDATE_DIR/check_and_fetch.sh" | awk '{print $1}')
           if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
             echo "❌ Hash mismatch for check_and_fetch.sh. Aborting update."
@@ -79,7 +79,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
       CURRENT_HASH=$(sha256sum "$UPDATE_SH_PATH" | awk '{print $1}')
       if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
         echo "⬆️ Updating update.sh..."
-        curl -s -o "$UPDATE_DIR/update.sh" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/update.sh"
+        curl -s -o "$UPDATE_DIR/update.sh" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/scripts/update.sh"
         DOWNLOADED_HASH=$(sha256sum "$UPDATE_DIR/update.sh" | awk '{print $1}')
         if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
           echo "❌ Hash mismatch for update.sh. Aborting update."
@@ -125,7 +125,7 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
       CURRENT_HASH=$(sha256sum "$GET_STATS_PATH" | awk '{print $1}')
       if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
         echo "⬆️ Updating get_stats.sh..."
-        curl -s -o "$UPDATE_DIR/get_stats.sh" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/get_stats.sh"
+        curl -s -o "$UPDATE_DIR/get_stats.sh" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/scripts/get_stats.sh"
         DOWNLOADED_HASH=$(sha256sum "$UPDATE_DIR/get_stats.sh" | awk '{print $1}')
         if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
           echo "❌ Hash mismatch for get_stats.sh. Aborting update."

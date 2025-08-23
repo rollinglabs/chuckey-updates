@@ -1,7 +1,7 @@
 {
   "version": "v0.9.33",
-  "release_date": "2025-08-23T05:31:30Z",
-  "description": "Fixes to dashboard",
+  "release_date": "2025-08-23T05:57:10Z",
+  "description": "Fix update scripts",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -20,7 +20,7 @@
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
-      "sha256": "e081d1362ab459f5a742e07fca7b2df9592e40f1b359ac882860e880902f0961"
+      "sha256": "19660cb68627eff84a6cc007b8c67eb9b2fb3444ec490be93f62a3dcfa32c3a9"
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",

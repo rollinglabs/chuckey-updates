@@ -19,8 +19,8 @@ REBOOT_BOOL=false
 [[ "$REBOOT" == "y" || "$REBOOT" == "Y" ]] && REBOOT_BOOL=true
 
 HASH_COMPOSE=$(shasum -a 256 ./stable/docker-compose.yml | awk '{print $1}')
-HASH_CHECK=$(shasum -a 256 ./stable/check_and_fetch.sh | awk '{print $1}')
-HASH_UPDATE=$(shasum -a 256 ./stable/update.sh | awk '{print $1}')
+HASH_CHECK=$(shasum -a 256 ./stable/scripts/check_and_fetch.sh | awk '{print $1}')
+HASH_UPDATE=$(shasum -a 256 ./stable/scripts/update.sh | awk '{print $1}')
 HASH_STATS=$(shasum -a 256 ./stable/scripts/get_stats.sh | awk '{print $1}')
 
 cat > ./stable/manifest.json <<EOF
