@@ -40,8 +40,11 @@ fi
 
 # CPU LOAD (1-minute average)
 start_section=$(date +%s%3N)
-CPU_LOAD=$(uptime | awk -F'load average:' '{ print $2 }' | cut -d',' -f1 | xargs)
-[ -z "$CPU_LOAD" ] && CPU_LOAD="Unavailable"
+if [ -f /proc/loadavg ]; then
+  CPU_LOAD=$(cut -d ' ' -f1 /proc/loadavg 2>/dev/null)
+else
+  CPU_LOAD="Unavailable"
+fi
 
 # CPU TEMP
 start_section=$(date +%s%3N)
