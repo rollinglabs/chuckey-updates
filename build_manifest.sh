@@ -52,7 +52,7 @@ cat > ./stable/manifest.json <<EOF
       "path": "/chuckey/scripts/update.sh",
       "sha256": "$HASH_UPDATE"
     },
-    "scripts/get_stats.sh": {
+    "get_stats.sh": {
       "path": "/chuckey/scripts/get_stats.sh",
       "sha256": "$HASH_STATS"
     }

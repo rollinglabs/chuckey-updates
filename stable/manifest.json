@@ -1,7 +1,7 @@
 {
   "version": "v0.9.31",
-  "release_date": "2025-08-23T04:36:45Z",
-  "description": "Fixed update scripts",
+  "release_date": "2025-08-23T04:40:27Z",
+  "description": "Fix manifest build script",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -26,7 +26,7 @@
       "path": "/chuckey/scripts/update.sh",
       "sha256": "a643addbc8b5b271ac20d913220728866c4d317b99ffd75eb9729ae98345c956"
     },
-    "scripts/get_stats.sh": {
+    "get_stats.sh": {
       "path": "/chuckey/scripts/get_stats.sh",
       "sha256": "5bf330cc147d95e86bfb7b4586504c35323b4e3604d768b9543c58f4fba1f040"
     }
