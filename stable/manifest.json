@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.36",
-  "release_date": "2025-08-26T11:39:15Z",
-  "description": "Added --force option to check_and_fetch",
+  "version": "v0.9.37",
+  "release_date": "2025-08-26T12:00:35Z",
+  "description": "UI improvements",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.35",
-      "description": "No change"
+      "version": "v0.9.36",
+      "description": "UI improvements"
     },
     "unifi-controller": {
       "version": "v9.3.45",
