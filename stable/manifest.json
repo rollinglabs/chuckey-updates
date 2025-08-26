@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.35",
-  "release_date": "2025-08-24T05:27:18Z",
-  "description": "Including unifi-controller",
+  "version": "v0.9.36",
+  "release_date": "2025-08-26T11:39:15Z",
+  "description": "Added --force option to check_and_fetch",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -20,11 +20,11 @@
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
-      "sha256": "19660cb68627eff84a6cc007b8c67eb9b2fb3444ec490be93f62a3dcfa32c3a9"
+      "sha256": "74bc88d2e02f0732c6d23981cfd99046613c69342aca1178c40907840b9630f8"
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",
-      "sha256": "a643addbc8b5b271ac20d913220728866c4d317b99ffd75eb9729ae98345c956"
+      "sha256": "205db4487976f232791edc13bc297ac4102751ffcf300bc1baee386b4143cefe"
     },
     "get_stats.sh": {
       "path": "/chuckey/scripts/get_stats.sh",
