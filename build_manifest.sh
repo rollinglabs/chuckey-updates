@@ -1,19 +1,33 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 
 set -e
 
-read -p "Version (e.g. v0.9.21): " VERSION
-read -p "Release date [Leave empty for now]: " RELEASE_DATE
-read -p "Description: " DESCRIPTION
-read -p "Requires reboot? (y/N): " REBOOT
-read -p "chuckey-ui version: " UI_VERSION
-read -p "chuckey-ui description: " UI_DESC
-read -p "unifi-controller version: " UNIFI_VERSION
-read -p "unifi-controller description: " UNIFI_DESC
+MANIFEST_PATH="./stable/manifest.json"
 
-if [[ -z "$RELEASE_DATE" ]]; then
-  RELEASE_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+# Extract current values if manifest exists
+if [[ -f "$MANIFEST_PATH" ]]; then
+  CURRENT_VERSION=$(jq -r '.version' "$MANIFEST_PATH")
+  CURRENT_DATE=$(jq -r '.release_date' "$MANIFEST_PATH")
+  CURRENT_DESC=$(jq -r '.description' "$MANIFEST_PATH")
+  CURRENT_REBOOT=$(jq -r '.requires_reboot' "$MANIFEST_PATH")
+  CURRENT_UI_VERSION=$(jq -r '.components["chuckey-ui"].version' "$MANIFEST_PATH")
+  CURRENT_UI_DESC=$(jq -r '.components["chuckey-ui"].description' "$MANIFEST_PATH")
+  CURRENT_UNIFI_VERSION=$(jq -r '.components["unifi-controller"].version' "$MANIFEST_PATH")
+  CURRENT_UNIFI_DESC=$(jq -r '.components["unifi-controller"].description' "$MANIFEST_PATH")
 fi
+
+read -e -i "$CURRENT_VERSION" -p "Version (e.g. v0.9.21): " VERSION
+DEFAULT_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+read -e -p "Release date [${DEFAULT_DATE}]: " RELEASE_DATE
+RELEASE_DATE=${RELEASE_DATE:-$DEFAULT_DATE}
+read -e -i "$CURRENT_DESC" -p "Description: " DESCRIPTION
+read -e -p "Requires reboot? (y/[N]): " REBOOT
+REBOOT=${REBOOT:-N}
+read -e -i "$CURRENT_UI_VERSION" -p "chuckey-ui version: " UI_VERSION
+read -e -i "$CURRENT_UI_DESC" -p "chuckey-ui description: " UI_DESC
+read -e -i "$CURRENT_UNIFI_VERSION" -p "unifi-controller version: " UNIFI_VERSION
+read -e -i "$CURRENT_UNIFI_DESC" -p "unifi-controller description: " UNIFI_DESC
 
 REBOOT_BOOL=false
 [[ "$REBOOT" == "y" || "$REBOOT" == "Y" ]] && REBOOT_BOOL=true

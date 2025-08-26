@@ -5,6 +5,14 @@ REMOTE_MANIFEST_URL="https://raw.githubusercontent.com/rollinglabs/chuckey-updat
 UPDATE_DIR="/chuckey/update"
 LOCAL_VERSION_FILE="/chuckey/VERSION"
 
+FORCE_UPDATE=false
+for arg in "$@"; do
+  if [ "$arg" = "--force" ]; then
+    FORCE_UPDATE=true
+    break
+  fi
+done
+
 mkdir -p "$UPDATE_DIR"
 
 
@@ -20,7 +28,7 @@ fi
 : "${SKIP_SELF_UPDATE:=false}"
 
 # Fetch remote version
-REMOTE_VERSION=$(curl -s "$REMOTE_MANIFEST_URL" | jq -r '.version')
+REMOTE_VERSION=$(curl -H 'Cache-Control: no-cache' -s "$REMOTE_MANIFEST_URL" | jq -r '.version')
 
 # Read local version
 if [ -f "$LOCAL_VERSION_FILE" ]; then
@@ -36,7 +44,7 @@ NEWER_VERSION=$(printf "%s\n%s" "$REMOTE_VERSION" "$CURRENT_VERSION" | sort -V |
 
 FILE_UPDATED=false
 
-if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_VERSION" ]; then
+if [ "$FORCE_UPDATE" = true ] || { [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_VERSION" ]; }; then
   echo "⬇️ Update available! Fetching..."
   curl -s -o "$UPDATE_DIR/manifest.json" "$REMOTE_MANIFEST_URL"
   echo "$REMOTE_VERSION" > "$UPDATE_DIR/VERSION"
@@ -148,6 +156,18 @@ if [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [ "$REMOTE_VERSION" != "$CURRENT_
   else
     echo "✅ All files already up to date"
   fi
+
+  if [ "$FORCE_UPDATE" = true ]; then
+    echo "🚨 Force flag detected: re-applying all files in manifest"
+    for file_key in $(jq -r '.files | keys[]' "$UPDATE_DIR/manifest.json"); do
+      file_url="https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/${file_key}"
+      dest_path=$(jq -r --arg k "$file_key" '.files[$k].path' "$UPDATE_DIR/manifest.json")
+      echo "🔁 Forcing update of $file_key to $dest_path"
+      curl -s -o "$dest_path" "$file_url"
+      chmod +x "$dest_path" 2>/dev/null || true
+    done
+  fi
+
   UPDATE_SH_PATH=$(jq -r '.files["update.sh"].path' "$UPDATE_DIR/manifest.json")
   "$UPDATE_SH_PATH"
 else
