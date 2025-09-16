@@ -1,11 +1,11 @@
 {
-  "version": "v0.9.42",
-  "release_date": "2025-09-16T22:31:24Z",
+  "version": "v0.9.43",
+  "release_date": "2025-09-16T22:51:31Z",
   "description": "UI fixes",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.41",
+      "version": "v0.9.42",
       "description": "UI fixes"
     },
     "unifi-controller": {
