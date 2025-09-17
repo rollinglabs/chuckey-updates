@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.54",
-  "release_date": "2025-09-17T04:46:48Z",
-  "description": "Updates to logging",
+  "version": "v0.9.55",
+  "release_date": "2025-09-17T05:04:16Z",
+  "description": "Updates to icons",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.53",
-      "description": "Updates to logging"
+      "version": "v0.9.54",
+      "description": "Updates to icons"
     },
     "unifi-controller": {
       "version": "v9.4.19",
