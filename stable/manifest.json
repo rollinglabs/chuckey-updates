@@ -1,11 +1,11 @@
 {
-  "version": "v0.9.48",
-  "release_date": "2025-09-17T00:18:55Z",
+  "version": "v0.9.49",
+  "release_date": "2025-09-17T00:35:21Z",
   "description": "Dashboard software update fixes",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.47",
+      "version": "v0.9.48",
       "description": "UI fixes"
     },
     "unifi-controller": {
