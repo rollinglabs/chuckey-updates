@@ -44,10 +44,10 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
 
         update_system_immediate)
             log_message "=== SYSTEM UPDATE TRIGGERED ==="
-            log_message "Executing: armbian-update"
+            log_message "Executing: /usr/bin/armbian-upgrade"
 
             # Execute system update and capture output
-            if armbian-update >> "$LOG_FILE" 2>&1; then
+            if /usr/bin/armbian-upgrade >> "$LOG_FILE" 2>&1; then
                 log_message "System update completed successfully"
             else
                 log_message "System update failed with exit code $?"

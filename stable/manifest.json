@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.50",
-  "release_date": "2025-09-17T02:38:28Z",
-  "description": "Dashboard software update fixes",
+  "version": "v0.9.51",
+  "release_date": "2025-09-17T03:22:08Z",
+  "description": "Updates to logging",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.49",
-      "description": "UI fixes"
+      "version": "v0.9.50",
+      "description": "Updates to logging"
     },
     "unifi-controller": {
       "version": "v9.4.19",
