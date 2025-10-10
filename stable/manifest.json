@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.60",
-  "release_date": "2025-10-10T06:13:58Z",
-  "description": "Fix desktop gutters with proper container width limits",
+  "version": "v0.9.61",
+  "release_date": "2025-10-10T06:39:24Z",
+  "description": "Add auto-update functionality with configurable schedules",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.59",
-      "description": "Fix desktop gutters by reducing container max-width instead of padding"
+      "version": "v0.9.60",
+      "description": "Add auto-update functionality with UI controls and systemd timer management"
     },
     "unifi-controller": {
       "version": "v9.4.19",
