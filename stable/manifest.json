@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.64",
-  "release_date": "2025-10-10T09:50:03Z",
-  "description": "Add security headers and external request debugging",
+  "version": "v0.9.65",
+  "release_date": "2025-10-10T10:14:05Z",
+  "description": "Implement debug-level logging for clean browser console",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.63",
-      "description": "Add comprehensive security headers and debugging for external requests"
+      "version": "v0.9.64",
+      "description": "Implement debug-level logging to clean up browser console"
     },
     "unifi-controller": {
       "version": "v9.4.19",
