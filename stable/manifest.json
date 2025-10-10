@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.59",
-  "release_date": "2025-10-10T03:46:20Z",
-  "description": "UI updates with enhanced desktop gutters",
+  "version": "v0.9.60",
+  "release_date": "2025-10-10T06:13:58Z",
+  "description": "Fix desktop gutters with proper container width limits",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.58",
-      "description": "Increase desktop gutters with more substantial padding"
+      "version": "v0.9.59",
+      "description": "Fix desktop gutters by reducing container max-width instead of padding"
     },
     "unifi-controller": {
       "version": "v9.4.19",
