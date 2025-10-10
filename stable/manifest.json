@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.57",
-  "release_date": "2025-09-17T05:33:17Z",
-  "description": "Updates to icons",
+  "version": "v0.9.58",
+  "release_date": "2025-10-10T03:22:55Z",
+  "description": "UI updates",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.56",
-      "description": "Updates to icons"
+      "version": "v0.9.57",
+      "description": "Increase desktop gutters for better spacing"
     },
     "unifi-controller": {
       "version": "v9.4.19",
