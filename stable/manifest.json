@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.63",
-  "release_date": "2025-10-10T09:32:50Z",
-  "description": "Comprehensive logging and UI improvements",
+  "version": "v0.9.64",
+  "release_date": "2025-10-10T09:50:03Z",
+  "description": "Add security headers and external request debugging",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.62",
-      "description": "Implement comprehensive logging and UI improvements"
+      "version": "v0.9.63",
+      "description": "Add comprehensive security headers and debugging for external requests"
     },
     "unifi-controller": {
       "version": "v9.4.19",
