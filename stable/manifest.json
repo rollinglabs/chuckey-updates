@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.61",
-  "release_date": "2025-10-10T06:39:24Z",
-  "description": "Add auto-update functionality with configurable schedules",
+  "version": "v0.9.62",
+  "release_date": "2025-10-10T06:46:26Z",
+  "description": "Fix auto-update settings persistence with writable data directory",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.60",
-      "description": "Add auto-update functionality with UI controls and systemd timer management"
+      "version": "v0.9.61",
+      "description": "Fix preferences path to use writable /app/data directory"
     },
     "unifi-controller": {
       "version": "v9.4.19",
