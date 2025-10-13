@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.65",
-  "release_date": "2025-10-13T05:38:39Z",
+  "version": "v0.9.66",
+  "release_date": "2025-10-13T05:48:28Z",
   "description": "Phase 2 manufacturing improvements with initialization and health checks",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
       "version": "v0.9.65",
-      "description": "Added initialization and health check endpoint"
+      "description": "Added initialization system and health check endpoint for manufacturing compatibility"
     },
     "unifi-controller": {
       "version": "latest",
