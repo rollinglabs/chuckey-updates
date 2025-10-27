@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.66",
-  "release_date": "2025-10-13T05:48:28Z",
-  "description": "Phase 2 manufacturing improvements with initialization and health checks",
+  "version": "v0.9.67",
+  "release_date": "2025-10-27T03:16:40Z",
+  "description": "Fixed health check endpoint from /update-check to /health",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -16,7 +16,7 @@
   "files": {
     "docker-compose.yml": {
       "path": "/chuckey/docker-compose.yml",
-      "sha256": "e684011cdfcbd3089a19659e1834c0b4323cbdc9ce0757fe62860542dd5cf833"
+      "sha256": "ae4b482614aedc1b8eb62346036e8f217d65604bfdc6fab6a3798c58b225a70e"
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
