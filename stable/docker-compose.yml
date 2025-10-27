@@ -11,6 +11,7 @@ services:
       - /chuckey/logs:/app/logs
       - /chuckey/data:/app/data
       - /var/lib/chuckey:/var/lib/chuckey
+      - /usr/local/bin:/host/bin:ro
     healthcheck:
       test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost/health')"]
       interval: 30s
