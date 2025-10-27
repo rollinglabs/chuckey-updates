@@ -4,10 +4,13 @@ services:
     container_name: chuckey-ui
     restart: unless-stopped
     network_mode: host
+    cap_add:
+      - SYS_ADMIN
     volumes:
       - /chuckey:/chuckey:ro
       - /chuckey/logs:/app/logs
       - /chuckey/data:/app/data
+      - /var/lib/chuckey:/var/lib/chuckey
     healthcheck:
       test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost/health')"]
       interval: 30s
