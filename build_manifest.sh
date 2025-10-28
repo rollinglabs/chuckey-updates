@@ -36,6 +36,7 @@ HASH_COMPOSE=$(shasum -a 256 ./stable/docker-compose.yml | awk '{print $1}')
 HASH_CHECK=$(shasum -a 256 ./stable/scripts/check_and_fetch.sh | awk '{print $1}')
 HASH_UPDATE=$(shasum -a 256 ./stable/scripts/update.sh | awk '{print $1}')
 HASH_STATS=$(shasum -a 256 ./stable/scripts/get_stats.sh | awk '{print $1}')
+HASH_MONITOR=$(shasum -a 256 ./stable/scripts/update_monitor.sh | awk '{print $1}')
 
 cat > ./stable/manifest.json <<EOF
 {
@@ -69,6 +70,10 @@ cat > ./stable/manifest.json <<EOF
     "get_stats.sh": {
       "path": "/chuckey/scripts/get_stats.sh",
       "sha256": "$HASH_STATS"
+    },
+    "update_monitor.sh": {
+      "path": "/chuckey/scripts/update_monitor.sh",
+      "sha256": "$HASH_MONITOR"
     }
   }
 }

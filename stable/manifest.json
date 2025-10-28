@@ -1,22 +1,22 @@
 {
-  "version": "v0.9.67",
-  "release_date": "2025-10-27T03:16:40Z",
-  "description": "Fixed health check endpoint from /update-check to /health",
+  "version": "v0.9.68",
+  "release_date": "2025-10-28T23:05:31Z",
+  "description": "Add customer setup wizard support to update_monitor.sh and fix docker-compose.yml volume mounts",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
       "version": "v0.9.65",
-      "description": "Added initialization system and health check endpoint for manufacturing compatibility"
+      "description": ""
     },
     "unifi-controller": {
       "version": "latest",
-      "description": "UniFi Network Controller"
+      "description": ""
     }
   },
   "files": {
     "docker-compose.yml": {
       "path": "/chuckey/docker-compose.yml",
-      "sha256": "ae4b482614aedc1b8eb62346036e8f217d65604bfdc6fab6a3798c58b225a70e"
+      "sha256": "56e7b2f75c156be5c06a60db337dc711dd91ef61ed5140e2783b3c6a922de08a"
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
@@ -29,6 +29,10 @@
     "get_stats.sh": {
       "path": "/chuckey/scripts/get_stats.sh",
       "sha256": "804b41b957ef376cafb1f43a4c3e8e9588157789674e647b454824eef00ff69f"
+    },
+    "update_monitor.sh": {
+      "path": "/chuckey/scripts/update_monitor.sh",
+      "sha256": "172305afaf6871369f23886aacb4e4daa1357a99a8e4050777eb8d4e7b360a5e"
     }
   }
 }
