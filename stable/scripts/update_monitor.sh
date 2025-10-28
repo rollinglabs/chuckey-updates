@@ -65,8 +65,10 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
             if [ -f "$DATA_DIR/setup_change_password" ]; then
                 PASSWORD=$(cat "$DATA_DIR/setup_change_password")
 
-                # Execute password change helper
-                if /usr/local/bin/chuckey-change-password "$PASSWORD" >> "$LOG_FILE" 2>&1; then
+                # Generate password hash using Python and update user
+                HASH=$(python3 -c "import crypt; print(crypt.crypt('$PASSWORD', crypt.mksalt(crypt.METHOD_SHA512)))" 2>&1)
+
+                if usermod -p "$HASH" chuckey >> "$LOG_FILE" 2>&1; then
                     log_message "Password changed successfully"
                 else
                     log_message "Password change failed with exit code $?"
