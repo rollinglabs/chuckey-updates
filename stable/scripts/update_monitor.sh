@@ -112,10 +112,8 @@ EOF
             if [ -f "$DATA_DIR/setup_change_timezone" ]; then
                 TIMEZONE=$(cat "$DATA_DIR/setup_change_timezone")
 
-                # Write timezone to /etc/timezone
-                echo "$TIMEZONE" > /etc/timezone
-
-                if [ $? -eq 0 ]; then
+                # Set timezone using timedatectl (also updates /etc/timezone and /etc/localtime)
+                if timedatectl set-timezone "$TIMEZONE" >> "$LOG_FILE" 2>&1; then
                     log_message "Timezone changed to $TIMEZONE successfully"
                 else
                     log_message "Timezone change failed with exit code $?"
