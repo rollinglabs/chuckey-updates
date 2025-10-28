@@ -4,14 +4,11 @@ services:
     container_name: chuckey-ui
     restart: unless-stopped
     network_mode: host
-    cap_add:
-      - SYS_ADMIN
     volumes:
       - /chuckey:/chuckey:ro
       - /chuckey/logs:/app/logs
       - /chuckey/data:/app/data
       - /var/lib/chuckey:/var/lib/chuckey
-      - /usr/local/bin:/host/bin:ro
       - /etc/default:/host/etc/default
       - /etc/timezone:/host/etc/timezone
     healthcheck:

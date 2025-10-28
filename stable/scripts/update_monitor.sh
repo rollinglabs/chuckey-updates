@@ -58,6 +58,26 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
             log_message "System update trigger files cleaned up"
             ;;
 
+        setup_change_password)
+            log_message "=== CUSTOMER SETUP: PASSWORD CHANGE TRIGGERED ==="
+
+            # Read password from trigger file
+            if [ -f "$DATA_DIR/setup_change_password" ]; then
+                PASSWORD=$(cat "$DATA_DIR/setup_change_password")
+
+                # Execute password change helper
+                if /usr/local/bin/chuckey-change-password "$PASSWORD" >> "$LOG_FILE" 2>&1; then
+                    log_message "Password changed successfully"
+                else
+                    log_message "Password change failed with exit code $?"
+                fi
+
+                # Clean up trigger file (contains password, remove immediately)
+                rm -f "$DATA_DIR/setup_change_password"
+                log_message "Password change trigger file cleaned up"
+            fi
+            ;;
+
         *)
             # Ignore other files
             ;;
