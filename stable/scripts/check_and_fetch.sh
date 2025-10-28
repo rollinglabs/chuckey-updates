@@ -146,6 +146,29 @@ if [ "$FORCE_UPDATE" = true ] || { [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [
         echo "✅ get_stats.sh is up to date"
       fi
     fi
+
+    UPDATE_MONITOR_PATH=$(jq -r '.files["update_monitor.sh"].path' "$UPDATE_DIR/manifest.json")
+    echo "🔍 Verifying update_monitor.sh at: $UPDATE_MONITOR_PATH"
+    if [ -f "$UPDATE_MONITOR_PATH" ]; then
+      EXPECTED_HASH=$(jq -r '.files["update_monitor.sh"].sha256' "$UPDATE_DIR/manifest.json")
+      CURRENT_HASH=$(sha256sum "$UPDATE_MONITOR_PATH" | awk '{print $1}')
+      if [ "$EXPECTED_HASH" != "$CURRENT_HASH" ]; then
+        echo "⬆️ Updating update_monitor.sh..."
+        curl -s -o "$UPDATE_DIR/update_monitor.sh" "https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/stable/scripts/update_monitor.sh"
+        DOWNLOADED_HASH=$(sha256sum "$UPDATE_DIR/update_monitor.sh" | awk '{print $1}')
+        if [ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]; then
+          echo "❌ Hash mismatch for update_monitor.sh. Aborting update."
+          exit 1
+        fi
+        mv "$UPDATE_DIR/update_monitor.sh" "$UPDATE_MONITOR_PATH"
+        chmod +x "$UPDATE_MONITOR_PATH"
+        FILE_UPDATED=true
+        echo "🔄 Restarting update monitor service..."
+        systemctl restart chuckey-update-monitor
+      else
+        echo "✅ update_monitor.sh is up to date"
+      fi
+    fi
   else
     echo "⚠️ jq not found, skipping update of other scripts"
   fi

@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.68",
-  "release_date": "2025-10-28T23:05:31Z",
-  "description": "Add customer setup wizard support to update_monitor.sh and fix docker-compose.yml volume mounts",
+  "version": "v0.9.69",
+  "release_date": "2025-10-28T23:13:53Z",
+  "description": "Add update_monitor.sh support to check_and_fetch.sh and auto-restart service",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -20,7 +20,7 @@
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
-      "sha256": "74bc88d2e02f0732c6d23981cfd99046613c69342aca1178c40907840b9630f8"
+      "sha256": "22fe674da876a1a8291fff51352acc4639794e474c4448840fc0569a7fd30d98"
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",
