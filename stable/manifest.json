@@ -1,16 +1,16 @@
 {
-  "version": "v0.9.70",
-  "release_date": "2025-10-29T01:03:02Z",
-  "description": "Refactor check_and_fetch.sh to dynamically update all manifest files",
+  "version": "v0.9.71",
+  "release_date": "2025-10-29T03:59:38Z",
+  "description": "Add customer setup wizard and auto-update scheduler with randomized jitter",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.65",
-      "description": ""
+      "version": "v0.9.66",
+      "description": "Customer setup wizard and auto-update scheduler"
     },
     "unifi-controller": {
-      "version": "latest",
-      "description": ""
+      "version": "v7.1.68",
+      "description": "Improve application backup and restore resiliency"
     }
   },
   "files": {
