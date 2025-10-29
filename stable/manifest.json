@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.71",
-  "release_date": "2025-10-29T03:59:38Z",
-  "description": "Add customer setup wizard and auto-update scheduler with randomized jitter",
+  "version": "v0.9.72",
+  "release_date": "2025-10-29T04:27:45Z",
+  "description": "Fix unifi-controller version number",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -9,7 +9,7 @@
       "description": "Customer setup wizard and auto-update scheduler"
     },
     "unifi-controller": {
-      "version": "v7.1.68",
+      "version": "v9.5.21",
       "description": "Improve application backup and restore resiliency"
     }
   },
