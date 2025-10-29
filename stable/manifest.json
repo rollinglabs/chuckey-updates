@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.69",
-  "release_date": "2025-10-28T23:13:53Z",
-  "description": "Add update_monitor.sh support to check_and_fetch.sh and auto-restart service",
+  "version": "v0.9.70",
+  "release_date": "2025-10-29T01:03:02Z",
+  "description": "Refactor check_and_fetch.sh to dynamically update all manifest files",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -20,7 +20,7 @@
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
-      "sha256": "22fe674da876a1a8291fff51352acc4639794e474c4448840fc0569a7fd30d98"
+      "sha256": "be18f668278208db922d1601c823d240c29af41a143fb945474531c0e51c829c"
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",
