@@ -200,10 +200,11 @@ set_network_config() {
     if [[ "$mode" == "dhcp" ]]; then
         log "Switching to DHCP mode"
 
-        # Set method to auto (DHCP) and remove static addresses
+        # Change method to auto FIRST (this allows addresses/gateway to be cleared)
+        # Then clear addresses and gateway
         nmcli con mod "$connection" ipv4.method auto
-        nmcli con mod "$connection" -ipv4.addresses 2>/dev/null || true
-        nmcli con mod "$connection" -ipv4.gateway 2>/dev/null || true
+        nmcli con mod "$connection" ipv4.gateway ""
+        nmcli con mod "$connection" ipv4.addresses ""
 
         # Restart connection to apply DHCP
         # Down first to release any static IP, then up to get DHCP lease
