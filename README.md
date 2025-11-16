@@ -73,6 +73,18 @@ Or via command line:
 /chuckey/scripts/check_and_fetch.sh --force
 ```
 
+## 📚 Documentation
+
+**For comprehensive development documentation, see:**
+- **[DEVELOPMENT.md](https://github.com/rollinglabs/chuckey-setup/blob/main/docs/DEVELOPMENT.md)** - Development workflows, script synchronization, testing procedures
+- **[MANUFACTURING-SYSTEM.md](https://github.com/rollinglabs/chuckey-setup/blob/main/docs/MANUFACTURING-SYSTEM.md)** - 3-phase manufacturing pipeline
+- **[CLAUDE.md](https://github.com/rollinglabs/chuckey-setup/blob/main/docs/CLAUDE.md)** - Complete project history and architecture
+
+**Quick Links:**
+- Script Synchronization Process: See [DEVELOPMENT.md - Script Synchronization](https://github.com/rollinglabs/chuckey-setup/blob/main/docs/DEVELOPMENT.md#script-synchronization)
+- Release Process: See [DEVELOPMENT.md - Release Process](https://github.com/rollinglabs/chuckey-setup/blob/main/docs/DEVELOPMENT.md#release-process)
+- Platform Compatibility: See [DEVELOPMENT.md - Platform Compatibility](https://github.com/rollinglabs/chuckey-setup/blob/main/docs/DEVELOPMENT.md#platform-compatibility)
+
 ## 🛠️ Development
 
 ### Building a New Manifest

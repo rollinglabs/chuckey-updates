@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.72",
-  "release_date": "2025-10-29T04:27:45Z",
-  "description": "Fix unifi-controller version number",
+  "version": "v0.9.73",
+  "release_date": "2025-11-16T23:06:55Z",
+  "description": "Fix system update compatibility across Armbian and Ubuntu platforms",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -32,7 +32,7 @@
     },
     "update_monitor.sh": {
       "path": "/chuckey/scripts/update_monitor.sh",
-      "sha256": "172305afaf6871369f23886aacb4e4daa1357a99a8e4050777eb8d4e7b360a5e"
+      "sha256": "8ea44232013d355d6a77961daf31df0186de7ff15796225d44c5e963f65f1035"
     }
   }
 }
