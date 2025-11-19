@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.74",
-  "release_date": "2025-11-19T02:54:24Z",
-  "description": "Enable self-updating script system for all manifest files",
+  "version": "v0.9.75",
+  "release_date": "2025-11-19T03:07:59Z",
+  "description": "Fix check_and_fetch.sh self-update capability (v0.9.74 incorrectly reverted to old version)",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -20,7 +20,7 @@
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
-      "sha256": "9c208618c93f0d1fa4d2dc588701054ccd4fe6e5b95514a804f5443f256623ff"
+      "sha256": "be18f668278208db922d1601c823d240c29af41a143fb945474531c0e51c829c"
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",
