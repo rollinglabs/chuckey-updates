@@ -29,7 +29,12 @@ NEW_VERSION=$(cat "$UPDATE_VERSION_FILE")
 echo "$NEW_VERSION" > "$LOCAL_VERSION_FILE"
 echo "📝 Updated version to $NEW_VERSION"
 
-# Start updated services
+# Stop and remove existing containers to avoid docker-compose 1.29.2 ContainerConfig bug
+# This bug occurs when recreating containers with newer Docker images that don't have ContainerConfig
+echo "🛑 Stopping existing containers..."
+docker compose -f "$CHUCKEY_DIR/docker-compose.yml" down --remove-orphans 2>/dev/null || true
+
+# Start updated services with fresh containers
 echo "🚀 Starting updated services..."
 docker compose -f "$CHUCKEY_DIR/docker-compose.yml" up -d
 

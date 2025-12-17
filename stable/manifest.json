@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.76",
-  "release_date": "2025-12-17T00:12:59Z",
-  "description": "Add network settings management (DHCP/Manual mode)",
+  "version": "v0.9.77",
+  "release_date": "2025-12-17T11:07:25Z",
+  "description": "Fix docker-compose 1.29.2 ContainerConfig compatibility issue",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -24,7 +24,7 @@
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",
-      "sha256": "205db4487976f232791edc13bc297ac4102751ffcf300bc1baee386b4143cefe"
+      "sha256": "06c3cb3903723ef8d517706b654ed3749e5229138df5bc3c01104abe0a7bc69c"
     },
     "get_stats.sh": {
       "path": "/chuckey/scripts/get_stats.sh",
