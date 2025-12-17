@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.77",
-  "release_date": "2025-12-17T11:07:25Z",
-  "description": "Fix docker-compose 1.29.2 ContainerConfig compatibility issue",
+  "version": "v0.9.78",
+  "release_date": "2025-12-17T11:36:15Z",
+  "description": "Add startup recovery for orphaned trigger files",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -32,7 +32,7 @@
     },
     "update_monitor.sh": {
       "path": "/chuckey/scripts/update_monitor.sh",
-      "sha256": "1369aac01d35bf747601212010f30418f966a68e8abfaeeeac307d24116b2d14"
+      "sha256": "d28127a578acb920e1a3fc5d83f873984f5cae26ffddc7b99276cb5f43925695"
     },
     "network_manager.sh": {
       "path": "/chuckey/scripts/network_manager.sh",

@@ -28,6 +28,134 @@ log_setup() {
 
 log_message "Chuckey Trigger Monitor started - watching $DATA_DIR"
 
+# ============================================================================
+# Process pre-existing trigger files on startup
+# This handles files left over from service restarts or system reboots
+# ============================================================================
+process_trigger_file() {
+    local file="$1"
+    log_message "Processing pre-existing trigger file: $file"
+
+    case "$file" in
+        update_apps_immediate)
+            log_message "=== APPS UPDATE (STARTUP RECOVERY) ==="
+            log_message "Executing: /chuckey/scripts/check_and_fetch.sh"
+            if /chuckey/scripts/check_and_fetch.sh >> "$LOG_FILE" 2>&1; then
+                log_message "Apps update completed successfully"
+            else
+                log_message "Apps update failed with exit code $?"
+            fi
+            rm -f "$DATA_DIR"/update_apps_*
+            log_message "Apps update trigger files cleaned up"
+            ;;
+
+        update_system_immediate)
+            log_message "=== SYSTEM UPDATE (STARTUP RECOVERY) ==="
+            log_message "Executing: apt update && apt upgrade"
+            if apt update >> "$LOG_FILE" 2>&1 && apt upgrade -y >> "$LOG_FILE" 2>&1; then
+                log_message "System update completed successfully"
+            else
+                log_message "System update failed with exit code $?"
+            fi
+            rm -f "$DATA_DIR"/update_system_*
+            log_message "System update trigger files cleaned up"
+            ;;
+
+        network_change)
+            log_message "=== NETWORK CHANGE (STARTUP RECOVERY) ==="
+            if [[ -f "$DATA_DIR/network_change" ]]; then
+                NETWORK_CONFIG=$(cat "$DATA_DIR/network_change")
+                log_message "Network configuration: $NETWORK_CONFIG"
+                if /chuckey/scripts/network_manager.sh set "$NETWORK_CONFIG" >> "$LOG_FILE" 2>&1; then
+                    log_message "Network settings applied successfully"
+                    touch "$DATA_DIR/network_change_success"
+                else
+                    ERROR_MSG=$(tail -1 "$LOG_FILE")
+                    log_message "Network settings failed: $ERROR_MSG"
+                    echo "$ERROR_MSG" > "$DATA_DIR/network_change_failed"
+                fi
+                rm -f "$DATA_DIR/network_change"
+                log_message "Network change trigger file cleaned up"
+            fi
+            ;;
+
+        setup_change_password)
+            log_setup "=== PASSWORD CHANGE (STARTUP RECOVERY) ==="
+            if [[ -f "$DATA_DIR/setup_change_password" ]]; then
+                new_password=$(cat "$DATA_DIR/setup_change_password")
+                if echo "chuckey:$new_password" | chpasswd 2>>"$SETUP_LOG_FILE"; then
+                    log_setup "Password changed successfully for user 'chuckey'"
+                    touch "$DATA_DIR/setup_password_changed"
+                else
+                    log_setup "ERROR: Failed to change password"
+                    touch "$DATA_DIR/setup_password_failed"
+                fi
+                rm -f "$DATA_DIR/setup_change_password"
+                log_setup "Removed trigger file: setup_change_password"
+            fi
+            ;;
+
+        setup_change_locale)
+            log_setup "=== LOCALE CHANGE (STARTUP RECOVERY) ==="
+            if [[ -f "$DATA_DIR/setup_change_locale" ]]; then
+                new_locale=$(cat "$DATA_DIR/setup_change_locale")
+                log_setup "Changing locale to: $new_locale"
+                locale_base="${new_locale%.*}"
+                if ! locale -a 2>/dev/null | grep -qi "^${locale_base}"; then
+                    log_setup "Generating locale: $new_locale"
+                    locale-gen "$new_locale" >>"$SETUP_LOG_FILE" 2>&1
+                fi
+                if update-locale LANG="$new_locale" >>"$SETUP_LOG_FILE" 2>&1; then
+                    log_setup "Locale changed successfully to: $new_locale"
+                    touch "$DATA_DIR/setup_locale_changed"
+                else
+                    log_setup "ERROR: Failed to change locale"
+                    touch "$DATA_DIR/setup_locale_failed"
+                fi
+                rm -f "$DATA_DIR/setup_change_locale"
+                log_setup "Removed trigger file: setup_change_locale"
+            fi
+            ;;
+
+        setup_change_timezone)
+            log_setup "=== TIMEZONE CHANGE (STARTUP RECOVERY) ==="
+            if [[ -f "$DATA_DIR/setup_change_timezone" ]]; then
+                new_timezone=$(cat "$DATA_DIR/setup_change_timezone")
+                log_setup "Changing timezone to: $new_timezone"
+                if timedatectl set-timezone "$new_timezone" >>"$SETUP_LOG_FILE" 2>&1; then
+                    log_setup "Timezone changed successfully to: $new_timezone"
+                    touch "$DATA_DIR/setup_timezone_changed"
+                else
+                    log_setup "ERROR: Failed to change timezone"
+                    touch "$DATA_DIR/setup_timezone_failed"
+                fi
+                rm -f "$DATA_DIR/setup_change_timezone"
+                log_setup "Removed trigger file: setup_change_timezone"
+            fi
+            ;;
+    esac
+}
+
+# Check for pre-existing trigger files before starting inotifywait
+log_message "Checking for pre-existing trigger files..."
+KNOWN_TRIGGERS="update_apps_immediate update_system_immediate network_change setup_change_password setup_change_locale setup_change_timezone"
+FOUND_TRIGGERS=0
+
+for trigger in $KNOWN_TRIGGERS; do
+    if [[ -f "$DATA_DIR/$trigger" ]]; then
+        FOUND_TRIGGERS=$((FOUND_TRIGGERS + 1))
+        process_trigger_file "$trigger"
+    fi
+done
+
+if [[ $FOUND_TRIGGERS -eq 0 ]]; then
+    log_message "No pre-existing trigger files found"
+else
+    log_message "Processed $FOUND_TRIGGERS pre-existing trigger file(s)"
+fi
+
+log_message "Starting inotifywait monitor..."
+
 # Monitor for file creation events
 inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file; do
     case "$file" in
