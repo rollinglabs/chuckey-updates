@@ -150,6 +150,30 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
             fi
             ;;
 
+        network_change)
+            log_message "=== NETWORK SETTINGS CHANGE TRIGGERED ==="
+
+            # Read network configuration from trigger file
+            if [[ -f "$DATA_DIR/network_change" ]]; then
+                NETWORK_CONFIG=$(cat "$DATA_DIR/network_change")
+                log_message "Network configuration: $NETWORK_CONFIG"
+
+                # Call network manager script with configuration
+                if /chuckey/scripts/network_manager.sh set "$NETWORK_CONFIG" >> "$LOG_FILE" 2>&1; then
+                    log_message "Network settings applied successfully"
+                    touch "$DATA_DIR/network_change_success"
+                else
+                    ERROR_MSG=$(tail -1 "$LOG_FILE")
+                    log_message "Network settings failed: $ERROR_MSG"
+                    echo "$ERROR_MSG" > "$DATA_DIR/network_change_failed"
+                fi
+
+                # Clean up trigger file
+                rm -f "$DATA_DIR/network_change"
+                log_message "Network change trigger file cleaned up"
+            fi
+            ;;
+
         setup_*)
             # Log other setup events for debugging
             log_setup "Setup event detected: $file"

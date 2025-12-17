@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.75",
-  "release_date": "2025-11-19T03:07:59Z",
-  "description": "Fix check_and_fetch.sh self-update capability (v0.9.74 incorrectly reverted to old version)",
+  "version": "v0.9.76",
+  "release_date": "2025-12-17T00:12:59Z",
+  "description": "Add network settings management (DHCP/Manual mode)",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -32,7 +32,11 @@
     },
     "update_monitor.sh": {
       "path": "/chuckey/scripts/update_monitor.sh",
-      "sha256": "8ea44232013d355d6a77961daf31df0186de7ff15796225d44c5e963f65f1035"
+      "sha256": "1369aac01d35bf747601212010f30418f966a68e8abfaeeeac307d24116b2d14"
+    },
+    "network_manager.sh": {
+      "path": "/chuckey/scripts/network_manager.sh",
+      "sha256": "39ea5b370e5a08f936ec259687f0846b2020901b0586ff83e0e9a8c4b5785234"
     }
   }
 }
