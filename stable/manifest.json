@@ -1,22 +1,22 @@
 {
-  "version": "v0.9.78",
-  "release_date": "2025-12-17T11:36:15Z",
-  "description": "Add startup recovery for orphaned trigger files",
+  "version": "v0.9.79",
+  "release_date": "2025-12-24T06:49:09Z",
+  "description": "Pin container versions and add System Settings UI",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.66",
-      "description": "Customer setup wizard and auto-update scheduler"
+      "version": "v0.9.67",
+      "description": "System Settings UI with network mode and auto-update scheduling"
     },
     "unifi-controller": {
-      "version": "v9.5.21",
-      "description": "Improve application backup and restore resiliency"
+      "version": "v10.0.162",
+      "description": "Fix WiFi blackout scheduler, LAG connections on UXG-Enterprise/EFG, WAN monitoring for DS-Lite over PPPoE"
     }
   },
   "files": {
     "docker-compose.yml": {
       "path": "/chuckey/docker-compose.yml",
-      "sha256": "56e7b2f75c156be5c06a60db337dc711dd91ef61ed5140e2783b3c6a922de08a"
+      "sha256": "dda9d4dbf3f9ae96c43c6ef021af3ca24004480a5f2f00ea8ceb778623226035"
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",

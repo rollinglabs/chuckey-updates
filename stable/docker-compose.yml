@@ -1,6 +1,6 @@
 services:
   chuckey-ui:
-    image: ghcr.io/rollinglabs/chuckey-ui:latest
+    image: ghcr.io/rollinglabs/chuckey-ui:v0.9.67
     container_name: chuckey-ui
     restart: unless-stopped
     network_mode: host
@@ -17,7 +17,7 @@ services:
       start_period: 10s
 
   unifi-controller:
-    image: jacobalberty/unifi:latest
+    image: jacobalberty/unifi:v10.0.162
     container_name: unifi-controller
     restart: unless-stopped
     network_mode: host
