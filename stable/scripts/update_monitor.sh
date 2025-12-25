@@ -133,7 +133,65 @@ process_trigger_file() {
                 log_setup "Removed trigger file: setup_change_timezone"
             fi
             ;;
+
+        app_install_*)
+            APP_ID="${file#app_install_}"
+            log_message "=== APP INSTALL (STARTUP RECOVERY): $APP_ID ==="
+            if [[ -f "$DATA_DIR/$file" ]]; then
+                manage_apps
+                rm -f "$DATA_DIR/$file"
+                touch "$DATA_DIR/app_install_${APP_ID}_complete"
+                log_message "App install trigger for $APP_ID cleaned up"
+            fi
+            ;;
+
+        app_uninstall_*)
+            APP_ID="${file#app_uninstall_}"
+            log_message "=== APP UNINSTALL (STARTUP RECOVERY): $APP_ID ==="
+            if [[ -f "$DATA_DIR/$file" ]]; then
+                manage_apps
+                rm -f "$DATA_DIR/$file"
+                touch "$DATA_DIR/app_uninstall_${APP_ID}_complete"
+                log_message "App uninstall trigger for $APP_ID cleaned up"
+            fi
+            ;;
     esac
+}
+
+# ============================================================================
+# App Management Function
+# Runs docker compose with both main and apps compose files
+# ============================================================================
+manage_apps() {
+    log_message "Managing app containers..."
+    local COMPOSE_DIR="/chuckey"
+    local MAIN_COMPOSE="$COMPOSE_DIR/docker-compose.yml"
+    local APPS_COMPOSE="$COMPOSE_DIR/apps-compose.yml"
+
+    # Build compose command
+    local COMPOSE_CMD="docker compose -f $MAIN_COMPOSE"
+    if [[ -f "$APPS_COMPOSE" ]]; then
+        COMPOSE_CMD="$COMPOSE_CMD -f $APPS_COMPOSE"
+        log_message "Including apps-compose.yml in deployment"
+    fi
+
+    # Pull any new images and recreate containers as needed
+    log_message "Pulling app images..."
+    if $COMPOSE_CMD pull >> "$LOG_FILE" 2>&1; then
+        log_message "App images pulled successfully"
+    else
+        log_message "WARNING: Some app images may have failed to pull"
+    fi
+
+    log_message "Starting/updating app containers..."
+    if $COMPOSE_CMD up -d --remove-orphans >> "$LOG_FILE" 2>&1; then
+        log_message "App containers started successfully"
+    else
+        log_message "ERROR: Failed to start app containers"
+        return 1
+    fi
+
+    return 0
 }
 
 # Check for pre-existing trigger files before starting inotifywait
@@ -143,6 +201,15 @@ FOUND_TRIGGERS=0
 
 for trigger in $KNOWN_TRIGGERS; do
     if [[ -f "$DATA_DIR/$trigger" ]]; then
+        FOUND_TRIGGERS=$((FOUND_TRIGGERS + 1))
+        process_trigger_file "$trigger"
+    fi
+done
+
+# Also check for app install/uninstall triggers (pattern-based)
+for trigger_file in "$DATA_DIR"/app_install_* "$DATA_DIR"/app_uninstall_*; do
+    if [[ -f "$trigger_file" ]]; then
+        trigger=$(basename "$trigger_file")
         FOUND_TRIGGERS=$((FOUND_TRIGGERS + 1))
         process_trigger_file "$trigger"
     fi
@@ -299,6 +366,44 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
                 # Clean up trigger file
                 rm -f "$DATA_DIR/network_change"
                 log_message "Network change trigger file cleaned up"
+            fi
+            ;;
+
+        app_install_*)
+            APP_ID="${file#app_install_}"
+            log_message "=== APP INSTALL TRIGGERED: $APP_ID ==="
+
+            if [[ -f "$DATA_DIR/$file" ]]; then
+                if manage_apps; then
+                    log_message "App $APP_ID installed successfully"
+                    touch "$DATA_DIR/app_install_${APP_ID}_complete"
+                else
+                    log_message "ERROR: Failed to install app $APP_ID"
+                    touch "$DATA_DIR/app_install_${APP_ID}_failed"
+                fi
+
+                # Clean up trigger file
+                rm -f "$DATA_DIR/$file"
+                log_message "App install trigger file cleaned up"
+            fi
+            ;;
+
+        app_uninstall_*)
+            APP_ID="${file#app_uninstall_}"
+            log_message "=== APP UNINSTALL TRIGGERED: $APP_ID ==="
+
+            if [[ -f "$DATA_DIR/$file" ]]; then
+                if manage_apps; then
+                    log_message "App $APP_ID uninstalled successfully"
+                    touch "$DATA_DIR/app_uninstall_${APP_ID}_complete"
+                else
+                    log_message "ERROR: Failed to uninstall app $APP_ID"
+                    touch "$DATA_DIR/app_uninstall_${APP_ID}_failed"
+                fi
+
+                # Clean up trigger file
+                rm -f "$DATA_DIR/$file"
+                log_message "App uninstall trigger file cleaned up"
             fi
             ;;
 
