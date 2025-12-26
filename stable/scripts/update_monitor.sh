@@ -22,6 +22,14 @@ log_message() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
+# Mask sensitive values in commands for safe logging
+# Replaces quoted strings after "setpassword" with ***
+mask_sensitive_command() {
+    local cmd="$1"
+    # Mask pihole setpassword 'password' or "password"
+    echo "$cmd" | sed -E "s/(setpassword\s+)['\"][^'\"]*['\"]/\1'***'/g"
+}
+
 log_setup() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$SETUP_LOG_FILE"
 }
@@ -39,12 +47,16 @@ process_trigger_file() {
     case "$file" in
         update_apps_immediate)
             log_message "=== APPS UPDATE (STARTUP RECOVERY) ==="
+            # Step 1: Check for official Chuckey updates (pinned container images)
+            log_message "Checking for Chuckey updates..."
             log_message "Executing: /chuckey/scripts/check_and_fetch.sh"
             if /chuckey/scripts/check_and_fetch.sh >> "$LOG_FILE" 2>&1; then
-                log_message "Apps update completed successfully"
+                log_message "Chuckey update check completed successfully"
             else
-                log_message "Apps update failed with exit code $?"
+                log_message "Chuckey update check failed with exit code $?"
             fi
+            # Step 2: Update installed marketplace apps (pull latest images)
+            update_installed_apps
             rm -f "$DATA_DIR"/update_apps_*
             log_message "Apps update trigger files cleaned up"
             ;;
@@ -168,7 +180,7 @@ process_trigger_file() {
                         done
                         if [[ $WAIT_COUNT -lt 30 ]]; then
                             sleep 5
-                            log_message "Executing: $POST_INSTALL_CMD"
+                            log_message "Executing: $(mask_sensitive_command "$POST_INSTALL_CMD")"
                             eval "$POST_INSTALL_CMD" >> "$LOG_FILE" 2>&1 || true
                         fi
                     fi
@@ -345,6 +357,61 @@ manage_app() {
     return 0
 }
 
+# ============================================================================
+# Update Installed Apps Function
+# Pulls latest images for installed apps (from apps-compose.yml) and recreates
+# containers if images have changed. Does NOT affect core services.
+# ============================================================================
+update_installed_apps() {
+    local COMPOSE_DIR="/chuckey"
+    local MAIN_COMPOSE="$COMPOSE_DIR/docker-compose.yml"
+    local APPS_COMPOSE="$COMPOSE_DIR/data/apps-compose.yml"
+
+    # Check if there are any installed apps
+    if [[ ! -f "$APPS_COMPOSE" ]]; then
+        log_message "No installed apps to update (apps-compose.yml not found)"
+        return 0
+    fi
+
+    log_message "Checking for app updates..."
+
+    # Build compose command for apps only
+    local COMPOSE_CMD="docker compose -f $MAIN_COMPOSE -f $APPS_COMPOSE"
+
+    # Pull latest images for all apps
+    log_message "Pulling latest images for installed apps..."
+    if $COMPOSE_CMD pull >> "$LOG_FILE" 2>&1; then
+        log_message "App images pulled successfully"
+    else
+        log_message "WARNING: Some app images may have failed to pull"
+    fi
+
+    # Get list of app service names from apps-compose.yml (exclude core services)
+    # apps-compose.yml only contains app services, so we can use all services from it
+    local APP_SERVICES
+    APP_SERVICES=$(docker compose -f "$APPS_COMPOSE" config --services 2>/dev/null || true)
+
+    if [[ -z "$APP_SERVICES" ]]; then
+        log_message "No app services found in apps-compose.yml"
+        return 0
+    fi
+
+    # Recreate app containers if images changed (without affecting core services)
+    log_message "Updating app containers..."
+    for service in $APP_SERVICES; do
+        log_message "Checking container: $service"
+        # Use up -d with the specific service to recreate only if needed
+        if $COMPOSE_CMD up -d "$service" >> "$LOG_FILE" 2>&1; then
+            log_message "Container $service updated"
+        else
+            log_message "WARNING: Failed to update container $service"
+        fi
+    done
+
+    log_message "App updates completed"
+    return 0
+}
+
 # Legacy function for backwards compatibility with startup recovery
 # This is called when we don't have a specific app_id context
 manage_apps() {
@@ -425,14 +492,18 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
     case "$file" in
         update_apps_immediate)
             log_message "=== APPS UPDATE TRIGGERED ==="
-            log_message "Executing: /chuckey/scripts/check_and_fetch.sh"
 
-            # Execute apps update and capture output
+            # Step 1: Check for official Chuckey updates (pinned container images)
+            log_message "Checking for Chuckey updates..."
+            log_message "Executing: /chuckey/scripts/check_and_fetch.sh"
             if /chuckey/scripts/check_and_fetch.sh >> "$LOG_FILE" 2>&1; then
-                log_message "Apps update completed successfully"
+                log_message "Chuckey update check completed successfully"
             else
-                log_message "Apps update failed with exit code $?"
+                log_message "Chuckey update check failed with exit code $?"
             fi
+
+            # Step 2: Update installed marketplace apps (pull latest images)
+            update_installed_apps
 
             # Clean up trigger files
             rm -f "$DATA_DIR"/update_apps_*
@@ -607,7 +678,7 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
                         if [[ $WAIT_COUNT -lt 30 ]]; then
                             # Give container a few more seconds to fully initialize
                             sleep 5
-                            log_message "Executing: $POST_INSTALL_CMD"
+                            log_message "Executing: $(mask_sensitive_command "$POST_INSTALL_CMD")"
                             if eval "$POST_INSTALL_CMD" >> "$LOG_FILE" 2>&1; then
                                 log_message "Post-install command completed successfully"
                             else
