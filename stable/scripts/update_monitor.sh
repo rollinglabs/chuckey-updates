@@ -135,6 +135,10 @@ process_trigger_file() {
             ;;
 
         app_install_*)
+            # Skip completion/failure marker files
+            if [[ "$file" == *_complete ]] || [[ "$file" == *_failed ]]; then
+                return
+            fi
             APP_ID="${file#app_install_}"
             log_message "=== APP INSTALL (STARTUP RECOVERY): $APP_ID ==="
             if [[ -f "$DATA_DIR/$file" ]]; then
@@ -146,6 +150,10 @@ process_trigger_file() {
             ;;
 
         app_uninstall_*)
+            # Skip completion/failure marker files
+            if [[ "$file" == *_complete ]] || [[ "$file" == *_failed ]]; then
+                return
+            fi
             APP_ID="${file#app_uninstall_}"
             log_message "=== APP UNINSTALL (STARTUP RECOVERY): $APP_ID ==="
             if [[ -f "$DATA_DIR/$file" ]]; then
@@ -166,16 +174,27 @@ manage_apps() {
     log_message "Managing app containers..."
     local COMPOSE_DIR="/chuckey"
     local MAIN_COMPOSE="$COMPOSE_DIR/docker-compose.yml"
-    local APPS_COMPOSE="$COMPOSE_DIR/apps-compose.yml"
+    local APPS_COMPOSE="$COMPOSE_DIR/data/apps-compose.yml"
 
     # Build compose command
     local COMPOSE_CMD="docker compose -f $MAIN_COMPOSE"
     if [[ -f "$APPS_COMPOSE" ]]; then
         COMPOSE_CMD="$COMPOSE_CMD -f $APPS_COMPOSE"
         log_message "Including apps-compose.yml in deployment"
+
+        # Create app data directories from volume mounts in apps-compose.yml
+        # Extract host paths from volumes (format: /host/path:/container/path)
+        if command -v grep &> /dev/null; then
+            grep -oP '^\s*-\s*\K/chuckey/apps[^:]+' "$APPS_COMPOSE" 2>/dev/null | while read -r dir; do
+                if [[ -n "$dir" && ! -d "$dir" ]]; then
+                    log_message "Creating app directory: $dir"
+                    mkdir -p "$dir"
+                fi
+            done
+        fi
     fi
 
-    # Pull any new images and recreate containers as needed
+    # Pull any new images
     log_message "Pulling app images..."
     if $COMPOSE_CMD pull >> "$LOG_FILE" 2>&1; then
         log_message "App images pulled successfully"
@@ -183,8 +202,13 @@ manage_apps() {
         log_message "WARNING: Some app images may have failed to pull"
     fi
 
-    log_message "Starting/updating app containers..."
-    if $COMPOSE_CMD up -d --remove-orphans >> "$LOG_FILE" 2>&1; then
+    # Stop and remove containers first to avoid docker-compose 1.29.2 ContainerConfig bug
+    # This bug occurs when recreating containers with newer Docker images
+    log_message "Stopping containers for clean restart..."
+    $COMPOSE_CMD down --remove-orphans >> "$LOG_FILE" 2>&1 || true
+
+    log_message "Starting app containers..."
+    if $COMPOSE_CMD up -d >> "$LOG_FILE" 2>&1; then
         log_message "App containers started successfully"
     else
         log_message "ERROR: Failed to start app containers"
@@ -370,6 +394,10 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
             ;;
 
         app_install_*)
+            # Skip completion/failure marker files (they end with _complete or _failed)
+            if [[ "$file" == *_complete ]] || [[ "$file" == *_failed ]]; then
+                continue
+            fi
             APP_ID="${file#app_install_}"
             log_message "=== APP INSTALL TRIGGERED: $APP_ID ==="
 
@@ -389,6 +417,10 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
             ;;
 
         app_uninstall_*)
+            # Skip completion/failure marker files (they end with _complete or _failed)
+            if [[ "$file" == *_complete ]] || [[ "$file" == *_failed ]]; then
+                continue
+            fi
             APP_ID="${file#app_uninstall_}"
             log_message "=== APP UNINSTALL TRIGGERED: $APP_ID ==="
 
