@@ -142,9 +142,39 @@ process_trigger_file() {
             APP_ID="${file#app_install_}"
             log_message "=== APP INSTALL (STARTUP RECOVERY): $APP_ID ==="
             if [[ -f "$DATA_DIR/$file" ]]; then
-                manage_apps
+                # Read trigger file to check for hooks and commands
+                TRIGGER_CONTENT=$(cat "$DATA_DIR/$file" 2>/dev/null)
+                PRE_INSTALL=$(echo "$TRIGGER_CONTENT" | grep -oP '"pre_install"\s*:\s*"\K[^"]+' 2>/dev/null || true)
+                POST_INSTALL_CMD=$(echo "$TRIGGER_CONTENT" | grep -oP '"post_install_command"\s*:\s*"\K[^"]+' 2>/dev/null || true)
+
+                # Run pre_install hook if specified
+                if [[ -n "$PRE_INSTALL" ]]; then
+                    log_message "Running pre_install hook: $PRE_INSTALL"
+                    run_app_hook "$PRE_INSTALL"
+                fi
+
+                if manage_apps; then
+                    # Run post_install_command if specified
+                    if [[ -n "$POST_INSTALL_CMD" ]]; then
+                        log_message "Running post_install_command for $APP_ID..."
+                        CONTAINER_NAME="$APP_ID"
+                        WAIT_COUNT=0
+                        while [[ $WAIT_COUNT -lt 30 ]]; do
+                            if docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+                                break
+                            fi
+                            sleep 1
+                            WAIT_COUNT=$((WAIT_COUNT + 1))
+                        done
+                        if [[ $WAIT_COUNT -lt 30 ]]; then
+                            sleep 5
+                            log_message "Executing: $POST_INSTALL_CMD"
+                            eval "$POST_INSTALL_CMD" >> "$LOG_FILE" 2>&1 || true
+                        fi
+                    fi
+                    touch "$DATA_DIR/app_install_${APP_ID}_complete"
+                fi
                 rm -f "$DATA_DIR/$file"
-                touch "$DATA_DIR/app_install_${APP_ID}_complete"
                 log_message "App install trigger for $APP_ID cleaned up"
             fi
             ;;
@@ -457,9 +487,10 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
             log_message "=== APP INSTALL TRIGGERED: $APP_ID ==="
 
             if [[ -f "$DATA_DIR/$file" ]]; then
-                # Read trigger file to check for pre_install hook
+                # Read trigger file to check for hooks and commands
                 TRIGGER_CONTENT=$(cat "$DATA_DIR/$file" 2>/dev/null)
                 PRE_INSTALL=$(echo "$TRIGGER_CONTENT" | grep -oP '"pre_install"\s*:\s*"\K[^"]+' 2>/dev/null || true)
+                POST_INSTALL_CMD=$(echo "$TRIGGER_CONTENT" | grep -oP '"post_install_command"\s*:\s*"\K[^"]+' 2>/dev/null || true)
 
                 # Run pre_install hook if specified
                 if [[ -n "$PRE_INSTALL" ]]; then
@@ -469,6 +500,36 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
 
                 if manage_apps; then
                     log_message "App $APP_ID installed successfully"
+
+                    # Run post_install_command if specified
+                    if [[ -n "$POST_INSTALL_CMD" ]]; then
+                        log_message "Running post_install_command for $APP_ID..."
+                        # Wait for container to be running (up to 30 seconds)
+                        CONTAINER_NAME="$APP_ID"
+                        WAIT_COUNT=0
+                        while [[ $WAIT_COUNT -lt 30 ]]; do
+                            if docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+                                log_message "Container $CONTAINER_NAME is running"
+                                break
+                            fi
+                            sleep 1
+                            WAIT_COUNT=$((WAIT_COUNT + 1))
+                        done
+
+                        if [[ $WAIT_COUNT -lt 30 ]]; then
+                            # Give container a few more seconds to fully initialize
+                            sleep 5
+                            log_message "Executing: $POST_INSTALL_CMD"
+                            if eval "$POST_INSTALL_CMD" >> "$LOG_FILE" 2>&1; then
+                                log_message "Post-install command completed successfully"
+                            else
+                                log_message "WARNING: Post-install command failed (exit code $?)"
+                            fi
+                        else
+                            log_message "WARNING: Container $CONTAINER_NAME not running after 30s, skipping post_install_command"
+                        fi
+                    fi
+
                     touch "$DATA_DIR/app_install_${APP_ID}_complete"
                 else
                     log_message "ERROR: Failed to install app $APP_ID"
