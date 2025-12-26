@@ -277,28 +277,28 @@ manage_app() {
 
     log_message "Managing app container: $APP_ID (action: $ACTION)"
 
-    # Build compose command
-    local COMPOSE_CMD="docker compose -f $MAIN_COMPOSE"
-    if [[ -f "$APPS_COMPOSE" ]]; then
-        COMPOSE_CMD="$COMPOSE_CMD -f $APPS_COMPOSE"
-        log_message "Including apps-compose.yml"
-
-        # Create app data directories from volume mounts in apps-compose.yml
-        if command -v grep &> /dev/null; then
-            grep -oP '^\s*-\s*\K/chuckey/apps[^:]+' "$APPS_COMPOSE" 2>/dev/null | while read -r dir; do
-                if [[ -n "$dir" && ! -d "$dir" ]]; then
-                    log_message "Creating app directory: $dir"
-                    mkdir -p "$dir"
-                fi
-            done
-        fi
-    else
-        log_message "WARNING: apps-compose.yml not found"
-        return 1
-    fi
-
     case "$ACTION" in
         install)
+            # For install, we need apps-compose.yml
+            if [[ ! -f "$APPS_COMPOSE" ]]; then
+                log_message "ERROR: apps-compose.yml not found - cannot install"
+                return 1
+            fi
+
+            # Build compose command
+            local COMPOSE_CMD="docker compose -f $MAIN_COMPOSE -f $APPS_COMPOSE"
+            log_message "Including apps-compose.yml"
+
+            # Create app data directories from volume mounts in apps-compose.yml
+            if command -v grep &> /dev/null; then
+                grep -oP '^\s*-\s*\K/chuckey/apps[^:]+' "$APPS_COMPOSE" 2>/dev/null | while read -r dir; do
+                    if [[ -n "$dir" && ! -d "$dir" ]]; then
+                        log_message "Creating app directory: $dir"
+                        mkdir -p "$dir"
+                    fi
+                done
+            fi
+
             # Pull image for this specific app
             log_message "Pulling image for $APP_ID..."
             if $COMPOSE_CMD pull "$APP_ID" >> "$LOG_FILE" 2>&1; then
@@ -318,17 +318,22 @@ manage_app() {
             ;;
 
         uninstall)
-            # Stop and remove only this app container
+            # For uninstall, we can use docker directly - don't need compose file
             log_message "Stopping and removing container: $APP_ID..."
-            if $COMPOSE_CMD rm -sf "$APP_ID" >> "$LOG_FILE" 2>&1; then
+
+            # Stop the container
+            if docker stop "$APP_ID" >> "$LOG_FILE" 2>&1; then
+                log_message "Container $APP_ID stopped"
+            else
+                log_message "WARNING: Failed to stop container $APP_ID (may not be running)"
+            fi
+
+            # Remove the container
+            if docker rm "$APP_ID" >> "$LOG_FILE" 2>&1; then
                 log_message "Container $APP_ID removed successfully"
             else
                 log_message "WARNING: Failed to remove container $APP_ID (may not exist)"
             fi
-
-            # Clean up orphaned containers (apps that are no longer in compose file)
-            log_message "Cleaning up orphaned containers..."
-            $COMPOSE_CMD up -d --remove-orphans >> "$LOG_FILE" 2>&1 || true
             ;;
 
         *)
