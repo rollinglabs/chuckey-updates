@@ -167,6 +167,61 @@ process_trigger_file() {
 }
 
 # ============================================================================
+# App Hook Functions
+# Handle pre-install and post-uninstall hooks for apps
+# ============================================================================
+run_app_hook() {
+    local hook_name="$1"
+    log_message "Running app hook: $hook_name"
+
+    case "$hook_name" in
+        disable_resolved_stub)
+            # Disable systemd-resolved stub listener to free port 53 for Pi-hole
+            log_message "Disabling systemd-resolved DNS stub listener..."
+            if [[ -f /etc/systemd/resolved.conf ]]; then
+                # Backup original config
+                cp /etc/systemd/resolved.conf /etc/systemd/resolved.conf.bak 2>/dev/null || true
+                # Disable the stub listener
+                if grep -q "^DNSStubListener=" /etc/systemd/resolved.conf; then
+                    sed -i 's/^DNSStubListener=.*/DNSStubListener=no/' /etc/systemd/resolved.conf
+                elif grep -q "^#DNSStubListener=" /etc/systemd/resolved.conf; then
+                    sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/' /etc/systemd/resolved.conf
+                else
+                    echo "DNSStubListener=no" >> /etc/systemd/resolved.conf
+                fi
+                # Restart systemd-resolved
+                systemctl restart systemd-resolved >> "$LOG_FILE" 2>&1
+                log_message "systemd-resolved stub listener disabled"
+            else
+                log_message "WARNING: /etc/systemd/resolved.conf not found"
+            fi
+            ;;
+
+        enable_resolved_stub)
+            # Re-enable systemd-resolved stub listener
+            log_message "Re-enabling systemd-resolved DNS stub listener..."
+            if [[ -f /etc/systemd/resolved.conf.bak ]]; then
+                # Restore backup
+                cp /etc/systemd/resolved.conf.bak /etc/systemd/resolved.conf
+                systemctl restart systemd-resolved >> "$LOG_FILE" 2>&1
+                log_message "systemd-resolved stub listener re-enabled"
+            elif [[ -f /etc/systemd/resolved.conf ]]; then
+                # Just enable the stub listener
+                if grep -q "^DNSStubListener=" /etc/systemd/resolved.conf; then
+                    sed -i 's/^DNSStubListener=.*/DNSStubListener=yes/' /etc/systemd/resolved.conf
+                fi
+                systemctl restart systemd-resolved >> "$LOG_FILE" 2>&1
+                log_message "systemd-resolved stub listener re-enabled"
+            fi
+            ;;
+
+        *)
+            log_message "WARNING: Unknown hook: $hook_name"
+            ;;
+    esac
+}
+
+# ============================================================================
 # App Management Function
 # Runs docker compose with both main and apps compose files
 # ============================================================================
@@ -402,6 +457,16 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
             log_message "=== APP INSTALL TRIGGERED: $APP_ID ==="
 
             if [[ -f "$DATA_DIR/$file" ]]; then
+                # Read trigger file to check for pre_install hook
+                TRIGGER_CONTENT=$(cat "$DATA_DIR/$file" 2>/dev/null)
+                PRE_INSTALL=$(echo "$TRIGGER_CONTENT" | grep -oP '"pre_install"\s*:\s*"\K[^"]+' 2>/dev/null || true)
+
+                # Run pre_install hook if specified
+                if [[ -n "$PRE_INSTALL" ]]; then
+                    log_message "Running pre_install hook: $PRE_INSTALL"
+                    run_app_hook "$PRE_INSTALL"
+                fi
+
                 if manage_apps; then
                     log_message "App $APP_ID installed successfully"
                     touch "$DATA_DIR/app_install_${APP_ID}_complete"
@@ -425,9 +490,19 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
             log_message "=== APP UNINSTALL TRIGGERED: $APP_ID ==="
 
             if [[ -f "$DATA_DIR/$file" ]]; then
+                # Read trigger file to check for post_uninstall hook
+                TRIGGER_CONTENT=$(cat "$DATA_DIR/$file" 2>/dev/null)
+                POST_UNINSTALL=$(echo "$TRIGGER_CONTENT" | grep -oP '"post_uninstall"\s*:\s*"\K[^"]+' 2>/dev/null || true)
+
                 if manage_apps; then
                     log_message "App $APP_ID uninstalled successfully"
                     touch "$DATA_DIR/app_uninstall_${APP_ID}_complete"
+
+                    # Run post_uninstall hook if specified (only on success)
+                    if [[ -n "$POST_UNINSTALL" ]]; then
+                        log_message "Running post_uninstall hook: $POST_UNINSTALL"
+                        run_app_hook "$POST_UNINSTALL"
+                    fi
                 else
                     log_message "ERROR: Failed to uninstall app $APP_ID"
                     touch "$DATA_DIR/app_uninstall_${APP_ID}_failed"
