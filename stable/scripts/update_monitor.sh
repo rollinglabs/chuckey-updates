@@ -153,7 +153,7 @@ process_trigger_file() {
                     run_app_hook "$PRE_INSTALL"
                 fi
 
-                if manage_apps; then
+                if manage_app "install" "$APP_ID"; then
                     # Run post_install_command if specified
                     if [[ -n "$POST_INSTALL_CMD" ]]; then
                         log_message "Running post_install_command for $APP_ID..."
@@ -187,9 +187,19 @@ process_trigger_file() {
             APP_ID="${file#app_uninstall_}"
             log_message "=== APP UNINSTALL (STARTUP RECOVERY): $APP_ID ==="
             if [[ -f "$DATA_DIR/$file" ]]; then
-                manage_apps
+                # Read trigger file to check for post_uninstall hook
+                TRIGGER_CONTENT=$(cat "$DATA_DIR/$file" 2>/dev/null)
+                POST_UNINSTALL=$(echo "$TRIGGER_CONTENT" | grep -oP '"post_uninstall"\s*:\s*"\K[^"]+' 2>/dev/null || true)
+
+                if manage_app "uninstall" "$APP_ID"; then
+                    touch "$DATA_DIR/app_uninstall_${APP_ID}_complete"
+                    # Run post_uninstall hook if specified
+                    if [[ -n "$POST_UNINSTALL" ]]; then
+                        log_message "Running post_uninstall hook: $POST_UNINSTALL"
+                        run_app_hook "$POST_UNINSTALL"
+                    fi
+                fi
                 rm -f "$DATA_DIR/$file"
-                touch "$DATA_DIR/app_uninstall_${APP_ID}_complete"
                 log_message "App uninstall trigger for $APP_ID cleaned up"
             fi
             ;;
@@ -253,10 +263,87 @@ run_app_hook() {
 
 # ============================================================================
 # App Management Function
-# Runs docker compose with both main and apps compose files
+# Manages individual app containers without affecting core services
+# Usage: manage_app <action> <app_id>
+#   action: "install" or "uninstall"
+#   app_id: the app container name (e.g., "pihole")
 # ============================================================================
+manage_app() {
+    local ACTION="$1"
+    local APP_ID="$2"
+    local COMPOSE_DIR="/chuckey"
+    local MAIN_COMPOSE="$COMPOSE_DIR/docker-compose.yml"
+    local APPS_COMPOSE="$COMPOSE_DIR/data/apps-compose.yml"
+
+    log_message "Managing app container: $APP_ID (action: $ACTION)"
+
+    # Build compose command
+    local COMPOSE_CMD="docker compose -f $MAIN_COMPOSE"
+    if [[ -f "$APPS_COMPOSE" ]]; then
+        COMPOSE_CMD="$COMPOSE_CMD -f $APPS_COMPOSE"
+        log_message "Including apps-compose.yml"
+
+        # Create app data directories from volume mounts in apps-compose.yml
+        if command -v grep &> /dev/null; then
+            grep -oP '^\s*-\s*\K/chuckey/apps[^:]+' "$APPS_COMPOSE" 2>/dev/null | while read -r dir; do
+                if [[ -n "$dir" && ! -d "$dir" ]]; then
+                    log_message "Creating app directory: $dir"
+                    mkdir -p "$dir"
+                fi
+            done
+        fi
+    else
+        log_message "WARNING: apps-compose.yml not found"
+        return 1
+    fi
+
+    case "$ACTION" in
+        install)
+            # Pull image for this specific app
+            log_message "Pulling image for $APP_ID..."
+            if $COMPOSE_CMD pull "$APP_ID" >> "$LOG_FILE" 2>&1; then
+                log_message "Image pulled successfully for $APP_ID"
+            else
+                log_message "WARNING: Failed to pull image for $APP_ID (may use cached)"
+            fi
+
+            # Start only this app container (doesn't affect other containers)
+            log_message "Starting container: $APP_ID..."
+            if $COMPOSE_CMD up -d "$APP_ID" >> "$LOG_FILE" 2>&1; then
+                log_message "Container $APP_ID started successfully"
+            else
+                log_message "ERROR: Failed to start container $APP_ID"
+                return 1
+            fi
+            ;;
+
+        uninstall)
+            # Stop and remove only this app container
+            log_message "Stopping and removing container: $APP_ID..."
+            if $COMPOSE_CMD rm -sf "$APP_ID" >> "$LOG_FILE" 2>&1; then
+                log_message "Container $APP_ID removed successfully"
+            else
+                log_message "WARNING: Failed to remove container $APP_ID (may not exist)"
+            fi
+
+            # Clean up orphaned containers (apps that are no longer in compose file)
+            log_message "Cleaning up orphaned containers..."
+            $COMPOSE_CMD up -d --remove-orphans >> "$LOG_FILE" 2>&1 || true
+            ;;
+
+        *)
+            log_message "ERROR: Unknown action: $ACTION"
+            return 1
+            ;;
+    esac
+
+    return 0
+}
+
+# Legacy function for backwards compatibility with startup recovery
+# This is called when we don't have a specific app_id context
 manage_apps() {
-    log_message "Managing app containers..."
+    log_message "Managing all app containers..."
     local COMPOSE_DIR="/chuckey"
     local MAIN_COMPOSE="$COMPOSE_DIR/docker-compose.yml"
     local APPS_COMPOSE="$COMPOSE_DIR/data/apps-compose.yml"
@@ -268,7 +355,6 @@ manage_apps() {
         log_message "Including apps-compose.yml in deployment"
 
         # Create app data directories from volume mounts in apps-compose.yml
-        # Extract host paths from volumes (format: /host/path:/container/path)
         if command -v grep &> /dev/null; then
             grep -oP '^\s*-\s*\K/chuckey/apps[^:]+' "$APPS_COMPOSE" 2>/dev/null | while read -r dir; do
                 if [[ -n "$dir" && ! -d "$dir" ]]; then
@@ -287,13 +373,10 @@ manage_apps() {
         log_message "WARNING: Some app images may have failed to pull"
     fi
 
-    # Stop and remove containers first to avoid docker-compose 1.29.2 ContainerConfig bug
-    # This bug occurs when recreating containers with newer Docker images
-    log_message "Stopping containers for clean restart..."
-    $COMPOSE_CMD down --remove-orphans >> "$LOG_FILE" 2>&1 || true
-
+    # Only start/restart app containers - don't touch core services
+    # Use --no-recreate to avoid restarting existing healthy containers
     log_message "Starting app containers..."
-    if $COMPOSE_CMD up -d >> "$LOG_FILE" 2>&1; then
+    if $COMPOSE_CMD up -d --remove-orphans >> "$LOG_FILE" 2>&1; then
         log_message "App containers started successfully"
     else
         log_message "ERROR: Failed to start app containers"
@@ -498,7 +581,7 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
                     run_app_hook "$PRE_INSTALL"
                 fi
 
-                if manage_apps; then
+                if manage_app "install" "$APP_ID"; then
                     log_message "App $APP_ID installed successfully"
 
                     # Run post_install_command if specified
@@ -555,7 +638,7 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
                 TRIGGER_CONTENT=$(cat "$DATA_DIR/$file" 2>/dev/null)
                 POST_UNINSTALL=$(echo "$TRIGGER_CONTENT" | grep -oP '"post_uninstall"\s*:\s*"\K[^"]+' 2>/dev/null || true)
 
-                if manage_apps; then
+                if manage_app "uninstall" "$APP_ID"; then
                     log_message "App $APP_ID uninstalled successfully"
                     touch "$DATA_DIR/app_uninstall_${APP_ID}_complete"
 
