@@ -1,6 +1,6 @@
 services:
   chuckey-ui:
-    image: ghcr.io/rollinglabs/chuckey-ui:v0.9.67
+    image: ghcr.io/rollinglabs/chuckey-ui:v0.9.80
     container_name: chuckey-ui
     restart: unless-stopped
     network_mode: host

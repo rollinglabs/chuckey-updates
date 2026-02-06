@@ -1,12 +1,12 @@
 {
-  "version": "v0.9.79",
-  "release_date": "2025-12-24T06:49:09Z",
-  "description": "Pin container versions and add System Settings UI",
+  "version": "v0.9.80",
+  "release_date": "2026-02-06T04:23:14Z",
+  "description": "App Marketplace with Pi-hole, host networking, app update commands",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
-      "version": "v0.9.67",
-      "description": "System Settings UI with network mode and auto-update scheduling"
+      "version": "v0.9.80",
+      "description": "App Marketplace with Pi-hole support, host networking, password masking, app update commands"
     },
     "unifi-controller": {
       "version": "v10.0.162",
@@ -16,7 +16,7 @@
   "files": {
     "docker-compose.yml": {
       "path": "/chuckey/docker-compose.yml",
-      "sha256": "dda9d4dbf3f9ae96c43c6ef021af3ca24004480a5f2f00ea8ceb778623226035"
+      "sha256": "1b0238de55d036865cf3742dd9a32e487a31078ce36d3e7b1f683b8408d1c92e"
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
@@ -24,7 +24,7 @@
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",
-      "sha256": "06c3cb3903723ef8d517706b654ed3749e5229138df5bc3c01104abe0a7bc69c"
+      "sha256": "d8748d6a49015d9455fe06e8ba54bc781892c5d90ea7566a6213c5cd0387d3b8"
     },
     "get_stats.sh": {
       "path": "/chuckey/scripts/get_stats.sh",
@@ -32,7 +32,7 @@
     },
     "update_monitor.sh": {
       "path": "/chuckey/scripts/update_monitor.sh",
-      "sha256": "d28127a578acb920e1a3fc5d83f873984f5cae26ffddc7b99276cb5f43925695"
+      "sha256": "af6c1b2d00fcd25893da72cb81191cc8aafe222b117c2e9d56446bf0cef163e5"
     },
     "network_manager.sh": {
       "path": "/chuckey/scripts/network_manager.sh",
