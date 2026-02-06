@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.80",
-  "release_date": "2026-02-06T04:23:14Z",
-  "description": "App Marketplace with Pi-hole, host networking, app update commands",
+  "version": "v0.9.81",
+  "release_date": "2026-02-06T04:59:14Z",
+  "description": "Harden update process against orphaned containers",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -24,7 +24,7 @@
     },
     "update.sh": {
       "path": "/chuckey/scripts/update.sh",
-      "sha256": "d8748d6a49015d9455fe06e8ba54bc781892c5d90ea7566a6213c5cd0387d3b8"
+      "sha256": "ed482477379548bcafb55190e29b5c46d7542018bd659b2443ade12c22e95fba"
     },
     "get_stats.sh": {
       "path": "/chuckey/scripts/get_stats.sh",
@@ -32,7 +32,7 @@
     },
     "update_monitor.sh": {
       "path": "/chuckey/scripts/update_monitor.sh",
-      "sha256": "af6c1b2d00fcd25893da72cb81191cc8aafe222b117c2e9d56446bf0cef163e5"
+      "sha256": "cd2c15ea38d5d6af80593e006c5374186c8af9b7aad4cebb3ccdd71395da466e"
     },
     "network_manager.sh": {
       "path": "/chuckey/scripts/network_manager.sh",
