@@ -42,6 +42,16 @@ echo "📝 Updated version to $NEW_VERSION"
 echo "🛑 Stopping existing containers..."
 $COMPOSE_CMD down --remove-orphans 2>/dev/null || true
 
+# Force-remove any containers with conflicting names that docker compose down
+# couldn't manage (e.g. containers created manually via docker run without compose labels)
+echo "🔍 Checking for orphaned containers..."
+for name in $($COMPOSE_CMD config 2>/dev/null | grep 'container_name:' | awk '{print $2}'); do
+  if docker ps -a --format '{{.Names}}' | grep -q "^${name}$"; then
+    echo "🗑️ Removing orphaned container: $name"
+    docker rm -f "$name" 2>/dev/null || true
+  fi
+done
+
 # Start updated services with fresh containers
 echo "🚀 Starting updated services..."
 $COMPOSE_CMD up -d

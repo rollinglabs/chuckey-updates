@@ -377,19 +377,10 @@ update_installed_apps() {
 
     log_message "Checking for app updates..."
 
-    # Build compose command for apps only
+    # Build compose command with both files (needed for networking/dependencies)
     local COMPOSE_CMD="docker compose -f $MAIN_COMPOSE -f $APPS_COMPOSE"
 
-    # Pull latest images for all apps
-    log_message "Pulling latest images for installed apps..."
-    if $COMPOSE_CMD pull >> "$LOG_FILE" 2>&1; then
-        log_message "App images pulled successfully"
-    else
-        log_message "WARNING: Some app images may have failed to pull"
-    fi
-
     # Get list of app service names from apps-compose.yml (exclude core services)
-    # apps-compose.yml only contains app services, so we can use all services from it
     local APP_SERVICES
     APP_SERVICES=$(docker compose -f "$APPS_COMPOSE" config --services 2>/dev/null || true)
 
@@ -398,11 +389,18 @@ update_installed_apps() {
         return 0
     fi
 
+    # Pull latest images for app services only (not core services like chuckey-ui)
+    log_message "Pulling latest images for installed apps..."
+    if $COMPOSE_CMD pull $APP_SERVICES >> "$LOG_FILE" 2>&1; then
+        log_message "App images pulled successfully"
+    else
+        log_message "WARNING: Some app images may have failed to pull"
+    fi
+
     # Recreate app containers if images changed (without affecting core services)
     log_message "Updating app containers..."
     for service in $APP_SERVICES; do
         log_message "Checking container: $service"
-        # Use up -d with the specific service to recreate only if needed
         if $COMPOSE_CMD up -d "$service" >> "$LOG_FILE" 2>&1; then
             log_message "Container $service updated"
         else
