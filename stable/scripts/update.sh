@@ -5,7 +5,7 @@ UPDATE_DIR="/chuckey/update"
 CHUCKEY_DIR="/chuckey"
 LOCAL_VERSION_FILE="$CHUCKEY_DIR/VERSION"
 UPDATE_VERSION_FILE="$UPDATE_DIR/VERSION"
-APPS_COMPOSE="$CHUCKEY_DIR/apps-compose.yml"
+APPS_COMPOSE="$CHUCKEY_DIR/data/apps-compose.yml"
 
 echo "🛠️ Applying update..."
 

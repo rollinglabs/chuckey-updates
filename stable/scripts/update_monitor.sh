@@ -360,12 +360,14 @@ manage_app() {
 # ============================================================================
 # Update Installed Apps Function
 # Pulls latest images for installed apps (from apps-compose.yml) and recreates
-# containers if images have changed. Does NOT affect core services.
+# containers if images have changed. Also runs app-specific update commands
+# (e.g., pihole -g for gravity updates). Does NOT affect core services.
 # ============================================================================
 update_installed_apps() {
     local COMPOSE_DIR="/chuckey"
     local MAIN_COMPOSE="$COMPOSE_DIR/docker-compose.yml"
     local APPS_COMPOSE="$COMPOSE_DIR/data/apps-compose.yml"
+    local APPS_STATE="$COMPOSE_DIR/data/apps.json"
 
     # Check if there are any installed apps
     if [[ ! -f "$APPS_COMPOSE" ]]; then
@@ -407,6 +409,26 @@ update_installed_apps() {
             log_message "WARNING: Failed to update container $service"
         fi
     done
+
+    # Run app-specific update commands (e.g., pihole -g for gravity updates)
+    if [[ -f "$APPS_STATE" ]]; then
+        log_message "Running app-specific update commands..."
+        # Parse apps.json to find update_command for each installed app
+        for app_id in $APP_SERVICES; do
+            # Extract update_command for this app from apps.json using grep/sed (no jq dependency)
+            local UPDATE_CMD
+            UPDATE_CMD=$(grep -A5 "\"$app_id\"" "$APPS_STATE" 2>/dev/null | grep '"update_command"' | sed 's/.*"update_command"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' || true)
+
+            if [[ -n "$UPDATE_CMD" ]]; then
+                log_message "Running update command for $app_id: $UPDATE_CMD"
+                if eval "$UPDATE_CMD" >> "$LOG_FILE" 2>&1; then
+                    log_message "Update command for $app_id completed successfully"
+                else
+                    log_message "WARNING: Update command for $app_id failed (exit code $?)"
+                fi
+            fi
+        done
+    fi
 
     log_message "App updates completed"
     return 0
