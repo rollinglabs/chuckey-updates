@@ -1,0 +1,53 @@
+services:
+  chuckey-ui:
+    image: ghcr.io/rollinglabs/chuckey-ui:v0.9.80
+    container_name: chuckey-ui
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /chuckey:/chuckey:ro
+      - /chuckey/logs:/app/logs
+      - /chuckey/data:/app/data
+      - /var/lib/chuckey:/var/lib/chuckey
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  unifi-controller:
+    image: jacobalberty/unifi:v10.0.162
+    container_name: unifi-controller
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /unifi-controller/data:/unifi/data
+      - /unifi-controller/log:/unifi/log
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/8443'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # One-shot bootstrap container: deploys updated OTA scripts to field devices
+  # that have an outdated check_and_fetch.sh. Runs once and exits.
+  # Remove this service after all field devices have been patched.
+  ota-bootstrap:
+    image: alpine:3.21
+    container_name: ota-bootstrap
+    restart: "no"
+    network_mode: host
+    volumes:
+      - /chuckey/scripts:/chuckey/scripts:rw
+      - /chuckey/data:/chuckey/data:rw
+      - /chuckey:/chuckey-ro:ro
+    command: >
+      sh -c "apk add --no-cache curl jq >/dev/null 2>&1 &&
+      curl -sf -o /tmp/ota_bootstrap.sh
+      https://raw.githubusercontent.com/rollinglabs/chuckey-updates/main/beta/scripts/ota_bootstrap.sh &&
+      chmod +x /tmp/ota_bootstrap.sh &&
+      /tmp/ota_bootstrap.sh"

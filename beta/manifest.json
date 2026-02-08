@@ -1,0 +1,48 @@
+{
+  "version": "v0.9.82-beta.1",
+  "release_date": "2026-02-07T12:00:00Z",
+  "description": "OTA enhancement: channel system, migration framework, field device bootstrap",
+  "requires_reboot": false,
+  "components": {
+    "chuckey-ui": {
+      "version": "v0.9.80",
+      "description": "App Marketplace with Pi-hole support, host networking, password masking, app update commands"
+    },
+    "unifi-controller": {
+      "version": "v10.0.162",
+      "description": "Fix WiFi blackout scheduler, LAG connections on UXG-Enterprise/EFG, WAN monitoring for DS-Lite over PPPoE"
+    }
+  },
+  "files": {
+    "docker-compose.yml": {
+      "path": "/chuckey/docker-compose.yml",
+      "sha256": "836d5a0a641e9fe27801faa3aac363be302bac0f30823700a00c5f2fb4b01744"
+    },
+    "check_and_fetch.sh": {
+      "path": "/chuckey/scripts/check_and_fetch.sh",
+      "sha256": "35a47291941d105e39f2a5ef66825767073776b3cc58e0566e9c5c4949041116"
+    },
+    "update.sh": {
+      "path": "/chuckey/scripts/update.sh",
+      "sha256": "ed482477379548bcafb55190e29b5c46d7542018bd659b2443ade12c22e95fba"
+    },
+    "get_stats.sh": {
+      "path": "/chuckey/scripts/get_stats.sh",
+      "sha256": "804b41b957ef376cafb1f43a4c3e8e9588157789674e647b454824eef00ff69f"
+    },
+    "update_monitor.sh": {
+      "path": "/chuckey/scripts/update_monitor.sh",
+      "sha256": "cd2c15ea38d5d6af80593e006c5374186c8af9b7aad4cebb3ccdd71395da466e"
+    },
+    "network_manager.sh": {
+      "path": "/chuckey/scripts/network_manager.sh",
+      "sha256": "39ea5b370e5a08f936ec259687f0846b2020901b0586ff83e0e9a8c4b5785234"
+    }
+  },
+  "migrations": {
+    "001_add_led_service": {
+      "sha256": "aeae1e88369ad4dca06e6fc63fbae8d9e0cf654cc3ae27a7e50c797b0a0c82a8",
+      "description": "Add chuckey-led.service for LED restore on boot"
+    }
+  }
+}

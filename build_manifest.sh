@@ -1,9 +1,21 @@
 #!/usr/bin/env bash
 
-
 set -e
 
-MANIFEST_PATH="./stable/manifest.json"
+# Channel selection (default: stable)
+CHANNEL="${1:-stable}"
+CHANNEL_DIR="./${CHANNEL}"
+
+if [[ ! -d "$CHANNEL_DIR" ]]; then
+  echo "Error: Channel directory '$CHANNEL_DIR' does not exist"
+  echo "Usage: $0 [stable|beta]"
+  exit 1
+fi
+
+MANIFEST_PATH="${CHANNEL_DIR}/manifest.json"
+
+echo "Building manifest for channel: $CHANNEL"
+echo ""
 
 # Extract current values if manifest exists
 if [[ -f "$MANIFEST_PATH" ]]; then
@@ -32,14 +44,48 @@ read -e -i "$CURRENT_UNIFI_DESC" -p "unifi-controller description: " UNIFI_DESC
 REBOOT_BOOL=false
 [[ "$REBOOT" == "y" || "$REBOOT" == "Y" ]] && REBOOT_BOOL=true
 
-HASH_COMPOSE=$(shasum -a 256 ./stable/docker-compose.yml | awk '{print $1}')
-HASH_CHECK=$(shasum -a 256 ./stable/scripts/check_and_fetch.sh | awk '{print $1}')
-HASH_UPDATE=$(shasum -a 256 ./stable/scripts/update.sh | awk '{print $1}')
-HASH_STATS=$(shasum -a 256 ./stable/scripts/get_stats.sh | awk '{print $1}')
-HASH_MONITOR=$(shasum -a 256 ./stable/scripts/update_monitor.sh | awk '{print $1}')
-HASH_NETWORK=$(shasum -a 256 ./stable/scripts/network_manager.sh | awk '{print $1}')
+# Compute file hashes
+HASH_COMPOSE=$(shasum -a 256 "${CHANNEL_DIR}/docker-compose.yml" | awk '{print $1}')
+HASH_CHECK=$(shasum -a 256 "${CHANNEL_DIR}/scripts/check_and_fetch.sh" | awk '{print $1}')
+HASH_UPDATE=$(shasum -a 256 "${CHANNEL_DIR}/scripts/update.sh" | awk '{print $1}')
+HASH_STATS=$(shasum -a 256 "${CHANNEL_DIR}/scripts/get_stats.sh" | awk '{print $1}')
+HASH_MONITOR=$(shasum -a 256 "${CHANNEL_DIR}/scripts/update_monitor.sh" | awk '{print $1}')
+HASH_NETWORK=$(shasum -a 256 "${CHANNEL_DIR}/scripts/network_manager.sh" | awk '{print $1}')
 
-cat > ./stable/manifest.json <<EOF
+# Build migrations section (if migrations directory exists)
+MIGRATIONS_JSON=""
+if [[ -d "${CHANNEL_DIR}/migrations" ]]; then
+  MIGRATION_FILES=$(find "${CHANNEL_DIR}/migrations" -name "*.sh" -type f | sort)
+  if [[ -n "$MIGRATION_FILES" ]]; then
+    MIGRATIONS_JSON=",
+  \"migrations\": {"
+    FIRST=true
+    for mig_file in $MIGRATION_FILES; do
+      mig_name=$(basename "$mig_file" .sh)
+      mig_hash=$(shasum -a 256 "$mig_file" | awk '{print $1}')
+
+      # Read first comment line as description
+      mig_desc=$(grep "^# Migration" "$mig_file" | head -1 | sed 's/^# Migration [0-9]*: //')
+      if [[ -z "$mig_desc" ]]; then
+        mig_desc="Migration $mig_name"
+      fi
+
+      if [[ "$FIRST" != "true" ]]; then
+        MIGRATIONS_JSON+=","
+      fi
+      MIGRATIONS_JSON+="
+    \"$mig_name\": {
+      \"sha256\": \"$mig_hash\",
+      \"description\": \"$mig_desc\"
+    }"
+      FIRST=false
+    done
+    MIGRATIONS_JSON+="
+  }"
+  fi
+fi
+
+cat > "$MANIFEST_PATH" <<EOF
 {
   "version": "$VERSION",
   "release_date": "$RELEASE_DATE",
@@ -80,8 +126,17 @@ cat > ./stable/manifest.json <<EOF
       "path": "/chuckey/scripts/network_manager.sh",
       "sha256": "$HASH_NETWORK"
     }
-  }
+  }${MIGRATIONS_JSON}
 }
 EOF
 
-echo "✅ Manifest built: stable/manifest.json"
+echo ""
+echo "✅ Manifest built: $MANIFEST_PATH"
+
+# Show migrations if any
+if [[ -n "$MIGRATIONS_JSON" ]]; then
+  echo "   Migrations included:"
+  for mig_file in $(find "${CHANNEL_DIR}/migrations" -name "*.sh" -type f | sort); do
+    echo "   - $(basename "$mig_file" .sh)"
+  done
+fi
