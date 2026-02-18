@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.82-beta.1",
-  "release_date": "2026-02-07T12:00:00Z",
-  "description": "OTA enhancement: channel system, migration framework, field device bootstrap",
+  "version": "v0.9.82-beta.2",
+  "release_date": "2026-02-19T12:00:00Z",
+  "description": "OTA enhancement: channel system, migration framework, field device bootstrap; fix ContainerConfig crash on app updates",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -32,7 +32,7 @@
     },
     "update_monitor.sh": {
       "path": "/chuckey/scripts/update_monitor.sh",
-      "sha256": "cd2c15ea38d5d6af80593e006c5374186c8af9b7aad4cebb3ccdd71395da466e"
+      "sha256": "e97ef450df1b5541748cc41279eccfc975c0105f3425efca7713420ba6c596b7"
     },
     "network_manager.sh": {
       "path": "/chuckey/scripts/network_manager.sh",

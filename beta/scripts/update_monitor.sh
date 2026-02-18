@@ -401,6 +401,11 @@ update_installed_apps() {
     log_message "Updating app containers..."
     for service in $APP_SERVICES; do
         log_message "Checking container: $service"
+        # Stop and remove existing container first to avoid docker-compose v1.29.2
+        # ContainerConfig KeyError when new image lacks ContainerConfig field
+        log_message "Stopping $service for clean recreate..."
+        docker stop "$service" >> "$LOG_FILE" 2>&1 || true
+        docker rm "$service" >> "$LOG_FILE" 2>&1 || true
         if $COMPOSE_CMD up -d "$service" >> "$LOG_FILE" 2>&1; then
             log_message "Container $service updated"
         else
