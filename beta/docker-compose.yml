@@ -2,7 +2,7 @@ services:
   chuckey-ui:
     image: ghcr.io/rollinglabs/chuckey-ui:v0.9.80
     container_name: chuckey-ui
-    restart: unless-stopped
+    restart: always
     network_mode: host
     volumes:
       - /chuckey:/chuckey:ro
@@ -19,7 +19,7 @@ services:
   unifi-controller:
     image: jacobalberty/unifi:v10.0.162
     container_name: unifi-controller
-    restart: unless-stopped
+    restart: always
     network_mode: host
     volumes:
       - /unifi-controller/data:/unifi/data

@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.82-beta.2",
-  "release_date": "2026-02-19T12:00:00Z",
-  "description": "OTA enhancement: channel system, migration framework, field device bootstrap; fix ContainerConfig crash on app updates",
+  "version": "v0.9.82-beta.3",
+  "release_date": "2026-03-16T00:22:10Z",
+  "description": "Power cut hardening: restart:always for core containers, boot-time watchdog service",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -16,7 +16,7 @@
   "files": {
     "docker-compose.yml": {
       "path": "/chuckey/docker-compose.yml",
-      "sha256": "836d5a0a641e9fe27801faa3aac363be302bac0f30823700a00c5f2fb4b01744"
+      "sha256": "7beb197b098f6e8f5adfdcf54e046095a52c4cadb64df9a379ef4b9dc65d2795"
     },
     "check_and_fetch.sh": {
       "path": "/chuckey/scripts/check_and_fetch.sh",
@@ -37,12 +37,20 @@
     "network_manager.sh": {
       "path": "/chuckey/scripts/network_manager.sh",
       "sha256": "39ea5b370e5a08f936ec259687f0846b2020901b0586ff83e0e9a8c4b5785234"
+    },
+    "chuckey_watchdog.sh": {
+      "path": "/chuckey/scripts/chuckey_watchdog.sh",
+      "sha256": "24a7cfb6a986efb40ac0355649659e5937443a6ff39cfe9adfb25f49e9f5f235"
     }
   },
   "migrations": {
     "001_add_led_service": {
       "sha256": "aeae1e88369ad4dca06e6fc63fbae8d9e0cf654cc3ae27a7e50c797b0a0c82a8",
       "description": "Add chuckey-led.service for LED restore on boot"
+    },
+    "002_chuckey_watchdog": {
+      "sha256": "b1820f710aee2a20ac93736df860d582a0088b6f78680621b6858e60d59d8488",
+      "description": "Install chuckey-watchdog.service for power cut recovery"
     }
   }
 }

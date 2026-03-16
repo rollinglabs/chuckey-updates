@@ -52,6 +52,12 @@ HASH_STATS=$(shasum -a 256 "${CHANNEL_DIR}/scripts/get_stats.sh" | awk '{print $
 HASH_MONITOR=$(shasum -a 256 "${CHANNEL_DIR}/scripts/update_monitor.sh" | awk '{print $1}')
 HASH_NETWORK=$(shasum -a 256 "${CHANNEL_DIR}/scripts/network_manager.sh" | awk '{print $1}')
 
+# Optional scripts (only include if present in channel)
+HASH_WATCHDOG=""
+if [[ -f "${CHANNEL_DIR}/scripts/chuckey_watchdog.sh" ]]; then
+  HASH_WATCHDOG=$(shasum -a 256 "${CHANNEL_DIR}/scripts/chuckey_watchdog.sh" | awk '{print $1}')
+fi
+
 # Build migrations section (if migrations directory exists)
 MIGRATIONS_JSON=""
 if [[ -d "${CHANNEL_DIR}/migrations" ]]; then
@@ -125,7 +131,11 @@ cat > "$MANIFEST_PATH" <<EOF
     "network_manager.sh": {
       "path": "/chuckey/scripts/network_manager.sh",
       "sha256": "$HASH_NETWORK"
-    }
+    }$(if [[ -n "$HASH_WATCHDOG" ]]; then echo ",
+    \"chuckey_watchdog.sh\": {
+      \"path\": \"/chuckey/scripts/chuckey_watchdog.sh\",
+      \"sha256\": \"$HASH_WATCHDOG\"
+    }"; fi)
   }${MIGRATIONS_JSON}
 }
 EOF
