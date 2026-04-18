@@ -32,6 +32,15 @@ if ! docker info >/dev/null 2>&1; then
   exit 1
 fi
 
+# Wait for Docker's stale sandbox cleanup to complete before recovering containers.
+# On reboot, Docker starts containers via restart:always within the first few seconds,
+# then kills them ~20-25s later during stale network sandbox cleanup, setting
+# hasBeenManuallyStopped=true. The daemon's restart manager respects that flag and
+# refuses to restart them. By waiting 60s we ensure cleanup has finished and the
+# containers are in their final stopped state before we call docker start on them.
+echo "[$LOG_TAG] Waiting 60 seconds for Docker post-startup cleanup to settle..."
+sleep 60
+
 # Bring up any stopped or missing containers without recreating running ones.
 # --no-recreate: starts stopped containers by calling docker start (not recreate),
 # which avoids the docker-compose v1 ContainerConfig KeyError on newer images.

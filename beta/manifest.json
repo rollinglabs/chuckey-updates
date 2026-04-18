@@ -1,8 +1,8 @@
 {
-  "version": "v0.9.82-beta.5",
-  "release_date": "2026-04-18T05:47:45Z",
-  "description": "Implement requires_reboot OTA reboot support; reboot to resolve Docker daemon version mismatch (28.2.2->29.1.3)",
-  "requires_reboot": true,
+  "version": "v0.9.82-beta.6",
+  "release_date": "2026-04-18T06:01:38Z",
+  "description": "Fix watchdog timing: add 60s settle delay so containers recover after Docker stale sandbox cleanup",
+  "requires_reboot": false,
   "components": {
     "chuckey-ui": {
       "version": "v0.9.80",
@@ -40,7 +40,7 @@
     },
     "chuckey_watchdog.sh": {
       "path": "/chuckey/scripts/chuckey_watchdog.sh",
-      "sha256": "ffcb0f09a4420b8392fa0b601e90c790ebfc01219f29d3748ee41d4639687943"
+      "sha256": "6fc50234b5d6089db8a6f8672efb0f04b8151d496b0834814ff4d628283c59ff"
     }
   },
   "migrations": {
