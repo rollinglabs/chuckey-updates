@@ -205,6 +205,12 @@ if [ "$FORCE_UPDATE" = true ] || { [ "$NEWER_VERSION" = "$REMOTE_VERSION" ] && [
   if [ -f "$UPDATE_SH_PATH" ]; then
     "$UPDATE_SH_PATH"
   fi
+
+  # Reboot if the update requires it (e.g. Docker daemon upgrade, kernel update)
+  if jq -e '.requires_reboot == true' "$UPDATE_DIR/manifest.json" >/dev/null 2>&1; then
+    echo "🔄 Update requires a system reboot. Scheduling reboot in 60 seconds..."
+    shutdown -r +1 "Chuckey OTA: update ${REMOTE_VERSION} requires reboot"
+  fi
 else
   echo "✅ Already up to date"
 fi
