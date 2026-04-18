@@ -32,8 +32,15 @@ if ! docker info >/dev/null 2>&1; then
   exit 1
 fi
 
-# Bring up any stopped or missing containers
+# Bring up any stopped or missing containers without recreating running ones.
+# --no-recreate: starts stopped containers by calling docker start (not recreate),
+# which avoids the docker-compose v1 ContainerConfig KeyError on newer images.
 echo "[$LOG_TAG] Ensuring containers are running..."
-$COMPOSE_CMD up -d 2>&1 | sed "s/^/[$LOG_TAG] /"
+OUTPUT=$($COMPOSE_CMD up -d --no-recreate 2>&1)
+EXIT_CODE=$?
+echo "$OUTPUT" | sed "s/^/[$LOG_TAG] /"
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "[$LOG_TAG] WARNING: docker compose up --no-recreate failed (exit $EXIT_CODE)"
+fi
 
 echo "[$LOG_TAG] Container check complete"

@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.82-beta.3",
-  "release_date": "2026-03-16T00:22:10Z",
-  "description": "Power cut hardening: restart:always for core containers, boot-time watchdog service",
+  "version": "v0.9.82-beta.4",
+  "release_date": "2026-04-18T05:28:18Z",
+  "description": "Power cut hardening: fix watchdog ContainerConfig crash, patch app containers to restart:always",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -40,7 +40,7 @@
     },
     "chuckey_watchdog.sh": {
       "path": "/chuckey/scripts/chuckey_watchdog.sh",
-      "sha256": "24a7cfb6a986efb40ac0355649659e5937443a6ff39cfe9adfb25f49e9f5f235"
+      "sha256": "ffcb0f09a4420b8392fa0b601e90c790ebfc01219f29d3748ee41d4639687943"
     }
   },
   "migrations": {
@@ -51,6 +51,10 @@
     "002_chuckey_watchdog": {
       "sha256": "b1820f710aee2a20ac93736df860d582a0088b6f78680621b6858e60d59d8488",
       "description": "Install chuckey-watchdog.service for power cut recovery"
+    },
+    "003_fix_app_restart_policy": {
+      "sha256": "1cfa921806d9f3ad567586df862c0646bbbea92c622abd804b78fc9597f8ce99",
+      "description": "Fix restart policy for installed app containers"
     }
   }
 }
