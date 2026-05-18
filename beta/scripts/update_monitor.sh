@@ -63,8 +63,11 @@ process_trigger_file() {
 
         update_system_immediate)
             log_message "=== SYSTEM UPDATE (STARTUP RECOVERY) ==="
-            log_message "Executing: apt update && apt upgrade"
-            if apt update >> "$LOG_FILE" 2>&1 && apt upgrade -y >> "$LOG_FILE" 2>&1; then
+            log_message "Executing: apt-get update && apt-get upgrade"
+            if DEBIAN_FRONTEND=noninteractive apt-get update >> "$LOG_FILE" 2>&1 && \
+               DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
+                 -o Dpkg::Options::="--force-confdef" \
+                 -o Dpkg::Options::="--force-confold" >> "$LOG_FILE" 2>&1; then
                 log_message "System update completed successfully"
             else
                 log_message "System update failed with exit code $?"
@@ -537,10 +540,13 @@ inotifywait -m -e create,moved_to "$DATA_DIR" --format '%f' | while read -r file
 
         update_system_immediate)
             log_message "=== SYSTEM UPDATE TRIGGERED ==="
-            log_message "Executing: apt update && apt upgrade"
+            log_message "Executing: apt-get update && apt-get upgrade"
 
             # Execute system update and capture output
-            if apt update >> "$LOG_FILE" 2>&1 && apt upgrade -y >> "$LOG_FILE" 2>&1; then
+            if DEBIAN_FRONTEND=noninteractive apt-get update >> "$LOG_FILE" 2>&1 && \
+               DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
+                 -o Dpkg::Options::="--force-confdef" \
+                 -o Dpkg::Options::="--force-confold" >> "$LOG_FILE" 2>&1; then
                 log_message "System update completed successfully"
             else
                 log_message "System update failed with exit code $?"

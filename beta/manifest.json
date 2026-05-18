@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.82-beta.7",
-  "release_date": "2026-05-18T10:23:32Z",
-  "description": "Fix dpkg interrupted state from docker.io upgrade; pre-seed Docker restart debconf answer",
+  "version": "v0.9.82-beta.8",
+  "release_date": "2026-05-18T10:38:28Z",
+  "description": "Fix system update hanging on interactive apt prompts; use DEBIAN_FRONTEND=noninteractive",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -32,7 +32,7 @@
     },
     "update_monitor.sh": {
       "path": "/chuckey/scripts/update_monitor.sh",
-      "sha256": "e97ef450df1b5541748cc41279eccfc975c0105f3425efca7713420ba6c596b7"
+      "sha256": "f7340c01d69ee99f6fe2738ba7de22cdff030a0c84a9f548c42293e7c5aea94b"
     },
     "network_manager.sh": {
       "path": "/chuckey/scripts/network_manager.sh",
