@@ -1,7 +1,7 @@
 {
-  "version": "v0.9.82-beta.6",
-  "release_date": "2026-04-18T06:01:38Z",
-  "description": "Fix watchdog timing: add 60s settle delay so containers recover after Docker stale sandbox cleanup",
+  "version": "v0.9.82-beta.7",
+  "release_date": "2026-05-18T10:23:32Z",
+  "description": "Fix dpkg interrupted state from docker.io upgrade; pre-seed Docker restart debconf answer",
   "requires_reboot": false,
   "components": {
     "chuckey-ui": {
@@ -55,6 +55,10 @@
     "003_fix_app_restart_policy": {
       "sha256": "1cfa921806d9f3ad567586df862c0646bbbea92c622abd804b78fc9597f8ce99",
       "description": "Fix restart policy for installed app containers"
+    },
+    "004_fix_dpkg_interrupted": {
+      "sha256": "81a96c2c6862f0b4549654d4a12eb30dfd8ff6ca310d0acc82fe127427541dca",
+      "description": "Fix dpkg interrupted state from docker.io upgrade; pre-seed Docker restart debconf answer"
     }
   }
 }
